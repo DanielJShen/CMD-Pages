@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ncurses.h>
 #include <unistd.h>
-#include "Page.h"
+#include "EmptyPage.h"
 
 int main() {
     initscr();
@@ -15,9 +15,9 @@ int main() {
     start_color();
     wrefresh(stdscr);
 
-    Page page;
+    EmptyPage emptyPage;
     curs_set(0);
-    page.display();
+    emptyPage.display();
 
     getch(); //Will refresh if changes to win are not refreshed.
     endwin();
