@@ -17,7 +17,6 @@ public:
     Page();
 private:
     WINDOW *window;
-    //TODO Add content
     void create_newwin(int height, int width, int starty, int startx);
 };
 
