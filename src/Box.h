@@ -11,12 +11,13 @@
 
 class Box {
 public:
-    void display();
+    virtual void display();
+    WINDOW *window;
     Box(int x,int y);
 private:
-    WINDOW *window;
-    void create_newwin(int height, int width, int starty, int startx);
+    void createBox(int height, int width);
 };
 
+//#include "Box.cpp"
 
 #endif //CMDPAGES_BOX_H

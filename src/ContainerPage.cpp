@@ -2,12 +2,15 @@
 // Created by daniel on 04/11/18.
 //
 
-#include "EmptyPage.h"
+#include "ContainerPage.h"
 
-EmptyPage::EmptyPage(Box *contentPointer) {
+EmptyPage::EmptyPage(Box *contentPointer) : Page() {
     content = contentPointer;
 }
-EmptyPage::EmptyPage() {
+
+void EmptyPage::display() {
+    Page::display();
+    content->display();
 }
 
 void EmptyPage::setContent(Box *contentPointer) {

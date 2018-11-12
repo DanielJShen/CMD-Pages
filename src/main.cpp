@@ -1,7 +1,9 @@
 #include <iostream>
 #include <ncurses.h>
 #include <unistd.h>
-#include "EmptyPage.h"
+#include <vector>
+#include "ContainerPage.h"
+#include "MenuBox.h"
 
 int main() {
     initscr();
@@ -15,11 +17,16 @@ int main() {
     start_color();
     wrefresh(stdscr);
 
-    EmptyPage emptyPage;
+    std::vector<std::string> options = {"a","b","c"};
+    MenuBox box(60,12,options);
+    EmptyPage emptyPage(&box);
+    //emptyPage.setContent(&box);
+
     curs_set(0);
     emptyPage.display();
 
     getch(); //Will refresh if changes to win are not refreshed.
     endwin();
+    printf("\n");
     return 0;
 }
