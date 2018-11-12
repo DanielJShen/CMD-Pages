@@ -20,6 +20,6 @@ private:
     void create_newwin(int height, int width, int starty, int startx);
 };
 
-#include "Page.cpp"
+//#include "Page.cpp" //TODO What should I be doing instead
 
 #endif //CMDPAGES_PAGE_H

@@ -11,13 +11,14 @@ Page::Page() {
     #define COLOR_GRAY 0
     init_color(COLOR_GRAY,400,400,400);
     init_pair(1,COLOR_CYAN,COLOR_GRAY);
-    init_pair(2,COLOR_BLACK,COLOR_CYAN);
 
+    printf("Creating Page...");
     create_newwin(height, width, 0, 0);
 
 }
 void Page::display( void ) {
     wrefresh(window);
+
 }
 void Page::destroy( void ) {
     delwin(window);
@@ -25,6 +26,6 @@ void Page::destroy( void ) {
 
 void Page::create_newwin(int height, int width, int starty, int startx) {
     window = newwin(height, width, starty, startx);
-    box(window, 0 , 0);
+    //box(window, 0 , 0);
     wbkgd(window,COLOR_PAIR(1));
 }
