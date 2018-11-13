@@ -8,16 +8,17 @@
 #include "Page.h"
 #include "Box.h"
 
-class EmptyPage : public Page {
+class ContainerPage : public Page {
 public:
     void setContent(Box *contentPointer);
     void display();
-    EmptyPage(Box *contentPointer);
-    EmptyPage();
+    ContainerPage(Box *contentPointer);
+    ContainerPage();
+    Box* getBox();
 private:
     Box *content;
 };
 
-//#include "EmptyPage.cpp"
+//#include "ContainerPage.cpp"
 
 #endif //CMDPAGES_EMPTYPAGE_H

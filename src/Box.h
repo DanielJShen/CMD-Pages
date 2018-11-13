@@ -13,6 +13,7 @@ class Box {
 public:
     virtual void display();
     WINDOW *window;
+    WINDOW *borderWindow;
     Box(int x,int y);
 private:
     void createBox(int height, int width);

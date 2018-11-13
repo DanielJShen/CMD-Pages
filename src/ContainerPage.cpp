@@ -4,15 +4,19 @@
 
 #include "ContainerPage.h"
 
-EmptyPage::EmptyPage(Box *contentPointer) : Page() {
+ContainerPage::ContainerPage(Box *contentPointer) : Page() {
     content = contentPointer;
 }
 
-void EmptyPage::display() {
+void ContainerPage::display() {
     Page::display();
     content->display();
 }
 
-void EmptyPage::setContent(Box *contentPointer) {
+void ContainerPage::setContent(Box *contentPointer) {
     content = contentPointer;
+}
+
+Box* ContainerPage::getBox(){
+    return content;
 }
