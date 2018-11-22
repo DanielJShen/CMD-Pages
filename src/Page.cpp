@@ -3,6 +3,8 @@
 //
 
 #include "Page.h"
+#include "ContainerPage.h"
+#include "MenuBox.h"
 #include <ncurses.h>
 
 Page::Page() {
@@ -17,6 +19,7 @@ Page::Page() {
 
 }
 void Page::display( void ) {
+    redrawwin(window);
     wrefresh(window);
 
 }
@@ -29,3 +32,12 @@ void Page::create_newwin(int height, int width, int starty, int startx) {
     //box(window, 0 , 0);
     wbkgd(window,COLOR_PAIR(0));
 }
+
+Page* Page::getPreviousPage() {
+    return previousPage;
+}
+
+void Page::setPreviousPage(Page* prevPage) {
+    previousPage = prevPage;
+}
+
