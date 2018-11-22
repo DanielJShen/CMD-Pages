@@ -5,17 +5,11 @@
 #include "ContainerPage.h"
 #include "MenuBox.h"
 
-int main() {
-    initscr();
-    cbreak();
+void init();
+void mainloop(ContainerPage containerPage);
 
-    if(has_colors() == FALSE) {
-        endwin();
-        printf("Your terminal does not support color\n");
-        exit(1);
-    }
-    start_color();
-    wrefresh(stdscr);
+int main() {
+    init();
 
     std::vector<std::string> options = {"2nd Menu","Even Example 1","Final Example","abcdefghi"};
     MenuBox box(40,options);
@@ -26,27 +20,46 @@ int main() {
     ContainerPage containerPage2(&box2);
     box.setEntryPage(0,&containerPage2);
 
+    mainloop(containerPage);
+
+    return 0;
+}
+
+void init(){
+    initscr();
+    cbreak();
+
+    if(has_colors() == FALSE) {
+        endwin();
+        printf("Your terminal does not support color\n");
+        exit(1);
+    }
+    start_color();
+    wrefresh(stdscr);
+}
+
+void mainloop(ContainerPage containerPage){
     curs_set(0);
     noecho();
     cbreak();
     containerPage.display();
 
-    int input = wgetch(box.window);
     ContainerPage* currentPage = &containerPage;
+    int input = wgetch(currentPage->getBox()->window);
     while(true) {
         auto * menuBox = (MenuBox*) currentPage->getBox();
         if(input == 27) { // 27 = Esc code
 
             //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
-            nodelay(box.window,true);
+            nodelay(menuBox->window,true);
             int count = 0;
             do {
-                input = wgetch(box.window);//Gets the [ character from escape codes or ERR when ESC was pressed
+                input = wgetch(menuBox->window);//Gets the [ character from escape codes or ERR when ESC was pressed
                 count++;
                 usleep(10);
             } while(input == ERR && count < 100);
-            input = wgetch(box.window);
-            nodelay(box.window,false);
+            input = wgetch(menuBox->window);
+            nodelay(menuBox->window,false);
 
             if (input == 'A') { // \033[A = Up
                 menuBox->setSelected(menuBox->getSelected() - 1);
@@ -59,6 +72,7 @@ int main() {
                     break;
                 }
             }
+
         } else if (input == 10) { // 10 = Enter
             try {
                 ContainerPage *page = menuBox->getSelectionPage();
@@ -69,10 +83,8 @@ int main() {
             }
         }
         currentPage->display();
-        input = wgetch(box.window);
+        input = wgetch(menuBox->window);
     }
-
     endwin();
     printf("\n");
-    return 0;
 }
