@@ -28,30 +28,48 @@ int main() {
 
     curs_set(0);
     noecho();
-    keypad(stdscr,true);
     cbreak();
     containerPage.display();
 
-    int input = wgetch(stdscr);
+    int input = wgetch(box.window);
     ContainerPage* currentPage = &containerPage;
-    while(input != 27) { // 27 = Esc
+    while(true) {
         auto * menuBox = (MenuBox*) currentPage->getBox();
+        if(input == 27) { // 27 = Esc code
 
-        if(input == 259) { // 259 = Up
-            menuBox->setSelected(menuBox->getSelected()-1);
-        } else if(input == 258) { // 258 = Down
-            menuBox->setSelected(menuBox->getSelected()+1);
-        } else if(input == 10) { // 10 = Enter
+            //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
+            nodelay(box.window,true);
+            int count = 0;
+            do {
+                input = wgetch(box.window);//Gets the [ character from escape codes or ERR when ESC was pressed
+                count++;
+                usleep(10);
+            } while(input == ERR && count < 100);
+            input = wgetch(box.window);
+            nodelay(box.window,false);
+
+            if (input == 'A') { // \033[A = Up
+                menuBox->setSelected(menuBox->getSelected() - 1);
+            } else if (input == 'B') { // \033[B = Down
+                menuBox->setSelected(menuBox->getSelected() + 1);
+            } else if (input == ERR) { // No input
+                if (currentPage->getPreviousPage() != nullptr) {
+                    currentPage = (ContainerPage *) currentPage->getPreviousPage();
+                } else {
+                    break;
+                }
+            }
+        } else if (input == 10) { // 10 = Enter
             try {
                 ContainerPage *page = menuBox->getSelectionPage();
+                page->setPreviousPage(currentPage);
                 currentPage = page;
-            } catch( const std::runtime_error& e) {
-                printf("Error: %s\r",e.what());
+            } catch (const std::runtime_error &e) {
+                printf("Error: %s\r", e.what());
             }
-
         }
         currentPage->display();
-        input = wgetch(stdscr);
+        input = wgetch(box.window);
     }
 
     endwin();

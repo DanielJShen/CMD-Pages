@@ -19,6 +19,8 @@ Box::Box(int x, int y) {
 }
 
 void Box::display() {
+    redrawwin(borderWindow);
+    redrawwin(window);
     wrefresh(borderWindow);
     wrefresh(window);
 }

@@ -15,9 +15,12 @@ public:
     void display();
     void destroy();
     Page();
+    Page* getPreviousPage();
+    void setPreviousPage(Page* prevPage);
 private:
     WINDOW *window;
     void create_newwin(int height, int width, int starty, int startx);
+    Page* previousPage;
 };
 
 //#include "Page.cpp" //TODO What should I be doing instead
