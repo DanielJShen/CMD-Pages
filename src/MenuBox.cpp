@@ -1,22 +1,36 @@
-#include <utility>
-
 //
 // Created by daniel on 06/11/18.
 //
 
+#include <utility>
 #include "MenuBox.h"
+#include "MenuEntry.h"
+#include "Logger.h"
 #include <string>
+#include <etip.h>
 
-MenuBox::MenuBox(int x, int y) : Box::Box(x, y) {
 
+MenuBox *MenuBox::makeMenuBox(const std::vector<std::string>& entries) {
+    int highestLength = 0;
+    for (auto & entry : entries) {
+        int entryLength = entry.length();
+        if ( entryLength > highestLength) {
+            highestLength = entryLength;
+        }
+    }
+    int width = (int) highestLength+15;
+    int height = (int) entries.size()+4;
+
+    std::vector<MenuEntry> menuEntries = {};
+    menuEntries.reserve(entries.size());
+    for (std::string entry : entries) {
+        menuEntries.emplace_back( MenuEntry(entry) );
+    }
+
+    return new MenuBox(width,height,menuEntries);
 }
 
-MenuBox::MenuBox(int x, int y, std::vector<std::string> entries) : Box::Box(x, y) {
-    menuEntries = std::move(entries);
-    selectedEntry = 0;
-}
-
-MenuBox::MenuBox(int width, std::vector<std::string> entries) : Box::Box(width, (int) entries.size()+4) {
+MenuBox::MenuBox(int width, int height, std::vector<MenuEntry> entries) : Box::Box(width, height) {
     menuEntries = std::move(entries);
     selectedEntry = 0;
 }
@@ -24,7 +38,7 @@ MenuBox::MenuBox(int width, std::vector<std::string> entries) : Box::Box(width, 
 void MenuBox::display() {
     mvwprintw(window,0,2,"%s",menuName.c_str());
     for (int i = 0; i < menuEntries.size(); ++i) {
-        std::string value = menuEntries[i];
+        std::string value = menuEntries[i].getName();
 
         int position;
         std::string offset;
@@ -45,36 +59,56 @@ void MenuBox::display() {
     Box::display();
 }
 
-void MenuBox::setSelected(int position) {
-    if(position >= menuEntries.size()){
+void MenuBox::moveSelectionUp() {
+    if (menuEntries.empty()) {
         return;
     }
-    if(position < 0){
-        if(position == -1){
-            position += menuEntries.size();
-        }else{
-            return;
-        }
+
+    int newSelectedEntry = selectedEntry - 1;
+    if(newSelectedEntry < 0){
+        newSelectedEntry = (int)menuEntries.size() - 1;
     }
-    selectedEntry = position;
+    selectedEntry = newSelectedEntry;
 }
-int MenuBox::getSelected() {
-    return selectedEntry;
+void MenuBox::moveSelectionDown() {
+    if (menuEntries.empty()) {
+        return;
+    }
+
+    int newSelectedEntry = selectedEntry + 1;
+    if(newSelectedEntry >= menuEntries.size()){
+        newSelectedEntry = 0;
+    }
+    selectedEntry = newSelectedEntry;
 }
 
-ContainerPage* MenuBox::getSelectionPage() {
-    if( menuEntryContents.count(selectedEntry) == 0 ) {
-        throw std::runtime_error("There is no page defined for the selected entry");
+MenuEntry *MenuBox::getEntryWithName(const std::string& name) const {
+    for (const auto & menuEntry : menuEntries) {
+        if (menuEntry.getName() == name) {
+            return const_cast<MenuEntry *>(&menuEntry);
+        }
     }
-    return menuEntryContents[selectedEntry];
+    throw std::exception();
 }
-void MenuBox::setEntryPage(int entryNumber, ContainerPage* pagePointer) {
+
+ContainerPage* MenuBox::getDestinationPage() {
+    if(menuEntries[selectedEntry].getDestinationPage() == nullptr ) {
+        Logger::appendMessage("There is no destination page defined for the selected entry");
+        throw std::runtime_error("");
+    }
+    return menuEntries[selectedEntry].getDestinationPage();
+}
+void MenuBox::setDestinationPage(int entryNumber, ContainerPage* pagePointer) {
     if(entryNumber >= menuEntries.size() || entryNumber < 0){
         return;
     }
-    menuEntryContents.insert(std::pair<int, ContainerPage*>(entryNumber, pagePointer));
+    menuEntries[entryNumber].setDestinationPage(pagePointer);
+}
+void MenuBox::setDestinationPageByName(const std::string& name, ContainerPage* pagePointer) {
+    MenuEntry* entry = getEntryWithName(name);
+    entry->setDestinationPage(pagePointer);
 }
 
-void MenuBox::addMenuEntry(std::string text) {
-
+int MenuBox::getSelected() const {
+    return selectedEntry;
 }
