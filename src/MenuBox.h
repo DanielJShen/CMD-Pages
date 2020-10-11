@@ -7,28 +7,31 @@
 
 #include "Box.h"
 #include "ContainerPage.h"
+#include "MenuEntry.h"
 #include <string>
 #include <vector>
 #include <map>
 
+/** A Box which contains MenuEntries which can be selected to go to its defined page.
+ *
+ */
 class MenuBox : public Box {
 public:
-    MenuBox(int x,int y);
-    MenuBox(int x,int y, std::vector<std::string> entries);
-    MenuBox(int width, std::vector<std::string> entries);
+    static MenuBox* makeMenuBox(const std::vector<std::string>& entries);
+    static MenuBox* makeMenuBox(std::vector<MenuEntry> entries);
+    MenuBox(int x,int y, std::vector<MenuEntry> entries);
     void display() override;
-    void setSelected(int position);
-    int getSelected();
-    ContainerPage* getSelectionPage();
-    void setEntryPage(int entry, ContainerPage* pagePointer);
-    void addMenuEntry(std::string text);
+    int getSelected() const;
+    ContainerPage* getDestinationPage();
+    void setDestinationPage(int entryNumber, ContainerPage *pagePointer);
+    void setDestinationPageByName(const std::string &name, ContainerPage *pagePointer);
+    void moveSelectionDown();
+    void moveSelectionUp();
 private:
+    MenuEntry* getEntryWithName(const std::string& name) const;
     std::string menuName = "Menu";
-    std::vector<std::string> menuEntries;
-    std::map<int,ContainerPage*> menuEntryContents;
+    std::vector<MenuEntry> menuEntries;
     int selectedEntry;
 };
-
-//#include "MenuBox.cpp"
 
 #endif //CMDPAGES_MENUBOX_H

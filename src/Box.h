@@ -1,14 +1,15 @@
 //
 // Created by daniel on 04/11/18.
 //
-// A Box goes inside a Page and contains the functionality of the page
-//
 
 #ifndef CMDPAGES_BOX_H
 #define CMDPAGES_BOX_H
 
-#include <ncurses.h>
+#include <curses.h>
 
+/** A box is a displayed window which is displayed in the center of the terminal.
+ *  Extend the class to display something inside the box. Designed to be places inside a ContainerPage
+ */
 class Box {
 public:
     virtual void display();
@@ -18,7 +19,5 @@ public:
 private:
     void createBox(int height, int width);
 };
-
-//#include "Box.cpp"
 
 #endif //CMDPAGES_BOX_H

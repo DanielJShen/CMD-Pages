@@ -11,14 +11,11 @@
 class ContainerPage : public Page {
 public:
     void setContent(Box *contentPointer);
-    void display();
-    ContainerPage(Box *contentPointer);
-    ContainerPage();
+    void display() override;
+    explicit ContainerPage(Box *contentPointer);
     Box* getBox();
 private:
     Box *content;
 };
-
-//#include "ContainerPage.cpp"
 
 #endif //CMDPAGES_EMPTYPAGE_H
