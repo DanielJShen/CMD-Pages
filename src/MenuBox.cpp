@@ -7,8 +7,9 @@
 #include "MenuEntry.h"
 #include "Logger.h"
 #include <string>
-#include <etip.h>
+#include <math.h>
 
+#define BOX_HIGHLIGHT_COLOUR_PAIR 1
 
 MenuBox *MenuBox::makeMenuBox(const std::vector<std::string>& entries) {
     int highestLength = 0;
@@ -40,21 +41,24 @@ void MenuBox::display() {
     for (int i = 0; i < menuEntries.size(); ++i) {
         std::string value = menuEntries[i].getName();
 
-        int position;
+        double widthAvailable = window->_maxx - 1;
+        int textPosition;
         std::string offset;
         if( value.size()%2 == 0 ) {
-            position = static_cast<int>( (window->_maxx - value.size())/2 );
+            double textLength = (double)value.size() + 5;
+            textPosition = static_cast<int>( ceil((widthAvailable - textLength)/2) + 1 );
             offset = "  ";
         } else {
-            position = static_cast<int>( (window->_maxx - value.size() + 1)/2 );
+            double textLength = (double)value.size() + 4;
+            textPosition = static_cast<int>( ceil((widthAvailable - textLength)/2) + 1 );
             offset = " ";
         }
 
         if(selectedEntry == i){
-            wattron(window,COLOR_PAIR(1));
+            wattron(window,COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
         }
-        mvwprintw(window,i+2, position, "[ %s%s]", value.c_str(), offset.c_str());
-        wattroff(window,COLOR_PAIR(1));
+        mvwprintw(window,i+2, textPosition, "[ %s%s]", value.c_str(), offset.c_str());
+        wattroff(window,COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
     }
     Box::display();
 }

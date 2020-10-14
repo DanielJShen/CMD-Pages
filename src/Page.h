@@ -18,6 +18,8 @@ class Page {
 public:
     virtual void display();
     void destroy();
+
+    virtual void updateSize();
     Page();
     Page* getPreviousPage();
     void setPreviousPage(Page* prevPage);

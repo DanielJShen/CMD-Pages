@@ -13,6 +13,11 @@ void ContainerPage::display() {
     content->display();
 }
 
+void ContainerPage::updateSize() {
+    Page::updateSize();
+    content->updateSize();
+}
+
 void ContainerPage::setContent(Box *contentPointer) {
     content = contentPointer;
 }
