@@ -72,6 +72,7 @@ void displayPageLoop(ContainerPage containerPage){
             } else if (input == ERR) { // No input
                 if (currentPage->getPreviousPage() != nullptr) {
                     currentPage = (ContainerPage *) currentPage->getPreviousPage();
+                    currentPage->updateSize();
                 } else {
                     break;
                 }
@@ -82,9 +83,12 @@ void displayPageLoop(ContainerPage containerPage){
                 ContainerPage *page = menuBox->getDestinationPage();
                 page->setPreviousPage(currentPage);
                 currentPage = page;
+                currentPage->updateSize();
             } catch (const std::runtime_error &e) {
                 printf("Error: %s\r", e.what());
             }
+        } else if (input == KEY_RESIZE) {
+            currentPage->updateSize();
         }
         currentPage->display();
     }

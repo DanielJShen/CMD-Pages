@@ -12,10 +12,12 @@ class ContainerPage : public Page {
 public:
     void setContent(Box *contentPointer);
     void display() override;
+    void updateSize() override;
     explicit ContainerPage(Box *contentPointer);
     Box* getBox();
 private:
     Box *content;
+
 };
 
 #endif //CMDPAGES_EMPTYPAGE_H
