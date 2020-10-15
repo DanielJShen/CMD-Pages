@@ -3,8 +3,6 @@
 //
 
 #include "Page.h"
-#include "ContainerPage.h"
-#include "MenuBox.h"
 #include "Logger.h"
 #include <curses.h>
 

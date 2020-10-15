@@ -25,6 +25,7 @@ Box::Box(int x, int y) {
 }
 
 void Box::display() {
+    mvwprintw(window,0,2,"%s",boxName.c_str());
     redrawwin(borderWindow);
     redrawwin(window);
     wrefresh(borderWindow);
@@ -61,3 +62,8 @@ std::array<int, 4> Box::calculateCoordinates() {
     int startX = (COLS - width) / 2;
     return {height, width, startY, startX};
 }
+
+void Box::triggerEvent(Box::event eventType, const std::function<void(PagesCore::*)(Page*)> &changePageCallback) {
+
+}
+

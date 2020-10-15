@@ -7,11 +7,11 @@
 #include "MenuEntry.h"
 #include "Logger.h"
 #include <string>
-#include <math.h>
+#include <cmath>
 
 #define BOX_HIGHLIGHT_COLOUR_PAIR 1
 
-MenuBox *MenuBox::makeMenuBox(const std::vector<std::string>& entries) {
+MenuBox *MenuBox::makeMenuBox(std::string name, const std::vector<std::string>& entries) {
     int highestLength = 0;
     for (auto & entry : entries) {
         int entryLength = entry.length();
@@ -28,16 +28,17 @@ MenuBox *MenuBox::makeMenuBox(const std::vector<std::string>& entries) {
         menuEntries.emplace_back( MenuEntry(entry) );
     }
 
-    return new MenuBox(width,height,menuEntries);
+    return new MenuBox(width,height,std::move(name),menuEntries);
 }
 
-MenuBox::MenuBox(int width, int height, std::vector<MenuEntry> entries) : Box::Box(width, height) {
+MenuBox::MenuBox(int width, int height, std::string name, std::vector<MenuEntry> entries) : Box::Box(width, height) {
+    boxName = std::move(name);
     menuEntries = std::move(entries);
     selectedEntry = 0;
 }
 
 void MenuBox::display() {
-    mvwprintw(window,0,2,"%s",menuName.c_str());
+    //mvwprintw(window,0,2,"%s",boxName.c_str());
     for (int i = 0; i < menuEntries.size(); ++i) {
         std::string value = menuEntries[i].getName();
 
@@ -63,27 +64,38 @@ void MenuBox::display() {
     Box::display();
 }
 
-void MenuBox::moveSelectionUp() {
-    if (menuEntries.empty()) {
-        return;
-    }
-
-    int newSelectedEntry = selectedEntry - 1;
-    if(newSelectedEntry < 0){
-        newSelectedEntry = (int)menuEntries.size() - 1;
-    }
-    selectedEntry = newSelectedEntry;
-}
-void MenuBox::moveSelectionDown() {
-    if (menuEntries.empty()) {
-        return;
-    }
-
-    int newSelectedEntry = selectedEntry + 1;
-    if(newSelectedEntry >= menuEntries.size()){
-        newSelectedEntry = 0;
-    }
-    selectedEntry = newSelectedEntry;
+/** Triggers an event on the Box
+ *
+ * @param eventType The event being triggered
+ * @param changePageCallback A callback for changing the currently displayed page
+ */
+void MenuBox::triggerEvent(Box::event eventType, const std::function<void(PagesCore::*)(Page*)> &changePageCallback) {
+    switch (eventType) {
+        case UpKey:
+            if (!menuEntries.empty()) {
+                int newSelectedEntry = selectedEntry - 1;
+                if(newSelectedEntry < 0){
+                    newSelectedEntry = (int)menuEntries.size() - 1;
+                }
+                selectedEntry = newSelectedEntry;
+            }
+            break;
+        case DownKey:
+            if (!menuEntries.empty()) {
+                int newSelectedEntry = selectedEntry + 1;
+                if(newSelectedEntry >= menuEntries.size()){
+                    newSelectedEntry = 0;
+                }
+                selectedEntry = newSelectedEntry;
+            }
+            break;
+        case EnterKey:
+            changePageCallback(getDestinationPage());
+            break;
+        case EscapeKey:
+            changePageCallback(nullptr);
+            break;
+    };
 }
 
 MenuEntry *MenuBox::getEntryWithName(const std::string& name) const {
@@ -95,20 +107,20 @@ MenuEntry *MenuBox::getEntryWithName(const std::string& name) const {
     throw std::exception();
 }
 
-ContainerPage* MenuBox::getDestinationPage() {
+PageWithBox* MenuBox::getDestinationPage() {
     if(menuEntries[selectedEntry].getDestinationPage() == nullptr ) {
         Logger::appendMessage("There is no destination page defined for the selected entry");
         throw std::runtime_error("");
     }
     return menuEntries[selectedEntry].getDestinationPage();
 }
-void MenuBox::setDestinationPage(int entryNumber, ContainerPage* pagePointer) {
+void MenuBox::setDestinationPage(int entryNumber, PageWithBox* pagePointer) {
     if(entryNumber >= menuEntries.size() || entryNumber < 0){
         return;
     }
     menuEntries[entryNumber].setDestinationPage(pagePointer);
 }
-void MenuBox::setDestinationPageByName(const std::string& name, ContainerPage* pagePointer) {
+void MenuBox::setDestinationPageByName(const std::string& name, PageWithBox* pagePointer) {
     MenuEntry* entry = getEntryWithName(name);
     entry->setDestinationPage(pagePointer);
 }
