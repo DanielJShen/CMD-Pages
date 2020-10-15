@@ -6,7 +6,7 @@
 #define CMDPAGES_MENUBOX_H
 
 #include "Box.h"
-#include "ContainerPage.h"
+#include "PageWithBox.h"
 #include "MenuEntry.h"
 #include <string>
 #include <vector>
@@ -17,19 +17,18 @@
  */
 class MenuBox : public Box {
 public:
-    static MenuBox* makeMenuBox(const std::vector<std::string>& entries);
-    static MenuBox* makeMenuBox(std::vector<MenuEntry> entries);
-    MenuBox(int x,int y, std::vector<MenuEntry> entries);
+    static MenuBox* makeMenuBox(std::string name, const std::vector<std::string>& entries);
+    static MenuBox* makeMenuBox(std::string name, std::vector<MenuEntry> entries);
+    MenuBox(int x,int y, std::string name, std::vector<MenuEntry> entries);
     void display() override;
-    int getSelected() const;
-    ContainerPage* getDestinationPage();
-    void setDestinationPage(int entryNumber, ContainerPage *pagePointer);
-    void setDestinationPageByName(const std::string &name, ContainerPage *pagePointer);
-    void moveSelectionDown();
-    void moveSelectionUp();
+    void setDestinationPage(int entryNumber, PageWithBox *pagePointer);
+    void setDestinationPageByName(const std::string &name, PageWithBox *pagePointer);
+    void triggerEvent(Box::event eventType, const std::function<void(PagesCore::*)(Page*)> &changePageCallback) override;
 private:
     MenuEntry* getEntryWithName(const std::string& name) const;
-    std::string menuName = "Menu";
+    PageWithBox* getDestinationPage();
+    int getSelected() const;
+    std::string boxName = "Menu";
     std::vector<MenuEntry> menuEntries;
     int selectedEntry;
 };

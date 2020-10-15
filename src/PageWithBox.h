@@ -8,12 +8,12 @@
 #include "Page.h"
 #include "Box.h"
 
-class ContainerPage : public Page {
+class PageWithBox : public Page {
 public:
     void setContent(Box *contentPointer);
     void display() override;
     void updateSize() override;
-    explicit ContainerPage(Box *contentPointer);
+    explicit PageWithBox(Box *contentPointer);
     Box* getBox();
 private:
     Box *content;

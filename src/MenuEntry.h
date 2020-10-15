@@ -6,7 +6,7 @@
 #define CMDPAGES_MENUENTRY_H
 
 #include <string>
-#include "ContainerPage.h"
+#include "PageWithBox.h"
 
 /** An entry in a MenuBox.
  * The entry has text to be displayed and a pagePointer to indicate the page which is displayed when the entry is selected.
@@ -14,18 +14,18 @@
  */
 class MenuEntry {
 public:
-    MenuEntry(std::string name, ContainerPage* pagePointer);
+    MenuEntry(std::string name, PageWithBox* pagePointer);
 
     explicit MenuEntry(std::string& name);
 
-    void setDestinationPage(ContainerPage* containerPage);
+    void setDestinationPage(PageWithBox* containerPage);
 
     std::string getName() const;
-    ContainerPage* getDestinationPage();
+    PageWithBox* getDestinationPage();
 
 private:
     std::string entryText;
-    ContainerPage* pagePointer;
+    PageWithBox* pagePointer;
 };
 
 

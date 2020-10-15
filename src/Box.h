@@ -7,9 +7,12 @@
 
 #include <curses.h>
 #include <array>
+#include <functional>
+#include "Page.h"
+#include "PagesCore.h"
 
 /** A box is a displayed window which is displayed in the center of the terminal.
- *  Extend the class to display something inside the box. Designed to be places inside a ContainerPage
+ *  Extend the class to display something inside the box. Designed to be places inside a PageWithBox
  */
 class Box {
 public:
@@ -18,6 +21,15 @@ public:
     WINDOW *borderWindow;
     Box(int x,int y);
     void updateSize();
+
+    enum event
+    {   EnterKey = 0,
+        EscapeKey = 1,
+        UpKey = 2,
+        DownKey = 3
+    };
+    virtual void triggerEvent(Box::event eventType, const std::function<void(PagesCore::*)(Page*)> &changePageCallback);
+
 private:
     void createBox();
     std::array<int,4> calculateCoordinates();
@@ -25,6 +37,8 @@ private:
     int width;
     int height;
 
+protected:
+    std::string boxName = "Box";
 };
 
 #endif //CMDPAGES_BOX_H
