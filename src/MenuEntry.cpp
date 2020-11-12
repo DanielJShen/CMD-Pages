@@ -7,25 +7,29 @@
 #include "MenuEntry.h"
 #include "Logger.h"
 
-MenuEntry::MenuEntry(std::string name, PageWithBox* containerPage) {
-    this->entryText = std::move(name);
+MenuEntry::MenuEntry(std::string name, Page* containerPage) {
+    this->entryName = std::move(name);
     this->pagePointer = containerPage;
 }
 
 MenuEntry::MenuEntry(std::string& name) {
-    this->entryText = std::move(name);
+    this->entryName = std::move(name);
     this->pagePointer = nullptr;
 }
 
-void MenuEntry::setDestinationPage(PageWithBox *containerPage) {
-    Logger::appendMessage("Setting destination page to: "+std::to_string((long)containerPage));
+void MenuEntry::setDestinationPage(Page *containerPage) {
+    Logger::appendMessage("Setting destination page of '"+this->entryName+"' to: "+std::to_string((long)containerPage));
     this->pagePointer = containerPage;
 }
 
-std::string MenuEntry::getName() const {
-    return this->entryText;
+void MenuEntry::setName(std::string& name) {
+    this->entryName = name;
 }
 
-PageWithBox* MenuEntry::getDestinationPage() {
+std::string MenuEntry::getName() {
+    return this->entryName;
+}
+
+Page* MenuEntry::getDestinationPage() {
     return this->pagePointer;
 }
