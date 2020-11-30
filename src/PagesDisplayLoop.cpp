@@ -30,9 +30,14 @@ void PagesDisplayLoop::startPageLoop(Page* initialPage){
     noecho();
     cbreak();
     initialPage->display();
-
-    while(continuePageLoop) {
-        currentPage->iterate([this](auto && PH1) { changePage(PH1); });
+    try {
+        while (continuePageLoop) {
+            currentPage->iterate([this](auto &&PH1) { changePage(PH1); });
+        }
+    } catch (std::runtime_error& error) {
+        endwin();
+        printf("\n");
+        throw error;
     }
     endwin();
     printf("\n");
@@ -47,7 +52,6 @@ void PagesDisplayLoop::changePage(Page* page) {
     if (page != nullptr) {
         page->setPreviousPage(currentPage);
         currentPage = dynamic_cast<Page *>(page);
-
         currentPage->display();
     } else {
         if (currentPage->getPreviousPage() != nullptr) {

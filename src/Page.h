@@ -1,8 +1,8 @@
 //
 // Created by daniel on 02/11/18.
 //
-// A dialog box window. Must be in an ncurses program!
-// Creates a window which contains the dialog box.
+// A dialog box contentWindow. Must be in an ncurses program!
+// Creates a contentWindow which contains the dialog box.
 //
 
 #ifndef CMDPAGES_PAGE_H
@@ -48,11 +48,10 @@ public:
 protected:
     int windowWidth;
     int windowHeight;
-    WINDOW* window;
-    WINDOW* borderWindow;
+    WINDOW* contentWindow;
+    WINDOW* backgroundWindow;
 
     std::array<int,4> calculateCoordinates();
-    std::array<int, 4> calculateBorderCoordinates();
 
     Page* previousPage{};
     std::string pageName;
