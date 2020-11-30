@@ -16,11 +16,10 @@ int main() {
     std::vector<std::string> options2 = {"Example 2","test1","test2","test3"};
     MenuPage menuPage2 = MenuPage("2nd Menu", options2);
 
-//    FileBrowserBox* fileBrowserBox2 = FileBrowserBox::makeFileBrowserBox("File Browser 1",".");
-//    Page fileBrowserPage3(fileBrowserBox2);
+    FileBrowserPage fileBrowserPage = FileBrowserPage("File Browser 1",".",".*");
 
     initialPage.setDestinationPageByName(std::string("2nd Menu"),&menuPage2);
-//    initialPage->setDestinationPageByName(std::string("File Browser"),&fileBrowserPage3);
+    initialPage.setDestinationPageByName(std::string("File Browser"),&fileBrowserPage);
 
     pagesCore.startPageLoop(&initialPage);
 

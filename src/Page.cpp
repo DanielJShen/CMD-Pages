@@ -24,9 +24,14 @@ Page::Page() {
     init_color(COLOR_GRAY,400,400,400);
     init_color(COLOR_DARKGRAY,170,170,170);
     init_color(COLOR_BLUE,0,0,800);
-    init_pair(1,COLOR_WHITE,COLOR_GRAY);
-    init_pair(2,COLOR_WHITE,COLOR_DARKGRAY);
-    init_pair(3,COLOR_WHITE,COLOR_BLACK);
+    init_pair(1,COLOR_WHITE,COLOR_GRAY);     //BOX_HIGHLIGHT_COLOUR_PAIR
+    init_pair(2,COLOR_WHITE,COLOR_DARKGRAY); //BOX_COLOUR_PAIR
+    init_pair(3,COLOR_WHITE,COLOR_BLACK);    //BKG_COLOUR_PAIR
+
+    init_pair(4,COLOR_BLUE,COLOR_GRAY);      //BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR
+    init_pair(5,COLOR_BLUE,COLOR_DARKGRAY);  //BOX_DIRECTORY_COLOUR_PAIR
+    init_pair(6,COLOR_GREEN,COLOR_GRAY);     //BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR
+    init_pair(7,COLOR_GREEN,COLOR_DARKGRAY); //BOX_EXECUTABLE_COLOUR_PAIR
 }
 
 /** Creates the Curses windows, this is required in order to display anything.
