@@ -11,12 +11,13 @@
 
 #define BOX_HIGHLIGHT_COLOUR_PAIR 1
 #define BOX_COLOUR_PAIR 2
+#define BKG_COLOUR_PAIR 3
 
 Page::Page() {
     pageName = "Box";
     previousPage = nullptr;
-    window = nullptr;
-    borderWindow = nullptr;
+    backgroundWindow = nullptr;
+    contentWindow = nullptr;
     windowWidth = 0;
     windowHeight = 0;
 
@@ -25,26 +26,26 @@ Page::Page() {
     init_color(COLOR_BLUE,0,0,800);
     init_pair(1,COLOR_WHITE,COLOR_GRAY);
     init_pair(2,COLOR_WHITE,COLOR_DARKGRAY);
+    init_pair(3,COLOR_WHITE,COLOR_BLACK);
 }
 
 /** Creates the Curses windows, this is required in order to display anything.
  *
- * @param width Width of the displayed window
- * @param height Height of the displayed window
+ * @param width Width of the displayed contentWindow
+ * @param height Height of the displayed contentWindow
  */
 void Page::createWindows(int width, int height) {
 
     windowWidth = width;
     windowHeight = height;
 
-    auto [winHeight, winWidth, startY, startX] = calculateCoordinates();
-    window = newwin(winHeight, winWidth, startY, startX);
-    box(window, 0 , 0);
-    wbkgd(window,COLOR_PAIR(BOX_COLOUR_PAIR));
+    backgroundWindow = newwin(LINES, COLS, 0, 0);
+    wbkgd(backgroundWindow, COLOR_PAIR(BKG_COLOUR_PAIR));
 
-    auto [borderWindowHeight, borderWindowWidth, borderStartY, borderStartX] = calculateBorderCoordinates();
-    borderWindow = newwin(borderWindowHeight, borderWindowWidth, borderStartX, borderStartY);
-    wbkgd(borderWindow,COLOR_PAIR(BOX_COLOUR_PAIR));
+    auto [winHeight, winWidth, startY, startX] = calculateCoordinates();
+    contentWindow = newwin(winHeight, winWidth, startY, startX);
+    box(contentWindow, 0 , 0);
+    wbkgd(contentWindow, COLOR_PAIR(BOX_COLOUR_PAIR));
 }
 
 /** This function is run in a loop to detect key presses and update the terminal.
@@ -67,37 +68,30 @@ void Page::triggerEvent(Page::event eventType) {
 }
 
 void Page::display() {
-    mvwprintw(window,0,2,"%s",pageName.c_str());
-    redrawwin(window);
-    redrawwin(borderWindow);
-    wrefresh(window);
-    wrefresh(borderWindow);
+    mvwprintw(contentWindow, 0, 2, "%s", pageName.c_str());
+    redrawwin(backgroundWindow);
+    redrawwin(contentWindow);
+    wrefresh(backgroundWindow);
+    wrefresh(contentWindow);
 }
 
 void Page::updateSize() {
-    auto [height, width, startY, startX] = calculateCoordinates();
-    mvwin(window,startY,startX);
-    wresize(window, windowHeight, windowWidth);
+    mvwin(backgroundWindow, 0, 0);
+    wresize(backgroundWindow, LINES, COLS);
 
-    auto [borderHeight, borderWidth, borderStartY, borderStartX] = calculateBorderCoordinates();
-    mvwin(borderWindow,borderStartY,borderStartX);
-    wresize(borderWindow, borderHeight, borderWidth);
+    auto [height, width, startY, startX] = calculateCoordinates();
+    mvwin(contentWindow, startY, startX);
+    wresize(contentWindow, windowHeight, windowWidth);
 
 }
 
 void Page::destroy() {
-    delwin(borderWindow);
-    delwin(window);
+    delwin(backgroundWindow);
+    delwin(contentWindow);
 }
 
 std::array<int, 4> Page::calculateCoordinates() {
     int startY = (LINES - windowHeight) / 2;
     int startX = (COLS - windowWidth) / 2;
     return {windowHeight, windowWidth, startY, startX};
-}
-
-std::array<int, 4> Page::calculateBorderCoordinates() {
-    int startY = (LINES - windowHeight) / 2;
-    int startX = (COLS - windowWidth) / 2;
-    return {windowHeight, windowWidth + 2, startY, startX - 1};
 }

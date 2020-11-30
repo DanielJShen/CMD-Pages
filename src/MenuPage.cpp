@@ -57,25 +57,25 @@ int MenuPage::getLargestLength(std::vector<MenuEntry> entries) {
  * @param changePageCallback A callback for changing the page to be iterated over.
  */
 void MenuPage::iterate(const PageCallback &changePageCallback) {
-    input = wgetch(window);
+    input = wgetch(contentWindow);
     if(input == 27) { // 27 = Esc code
 
         //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
-        nodelay(window, true);
+        nodelay(contentWindow, true);
         int count = 0;
         do {
-            input = wgetch(window);//Gets the [ character from escape codes or ERR when ESC is pressed
+            input = wgetch(contentWindow);//Gets the [ character from escape codes or ERR when ESC is pressed
             count++;
             usleep(10);
         } while(input == ERR && count < 100);
-        input = wgetch(window);
-        nodelay(window, false);
+        input = wgetch(contentWindow);
+        nodelay(contentWindow, false);
 
         if (input == 'A') { // \033[A = Up
             triggerEvent(Page::UpKey);
         } else if (input == 'B') { // \033[B = Down
             triggerEvent(Page::DownKey);
-        } else if (input == ERR) { // No input or Escape
+        } else if (input == ERR) { // Escape
             changePageCallback(nullptr);
             return;
         }
@@ -92,8 +92,7 @@ void MenuPage::iterate(const PageCallback &changePageCallback) {
 }
 
 void MenuPage::display() {
-    Page::display();
-    //mvwprintw(window,0,2,"%s",pageName.c_str());
+    //mvwprintw(contentWindow,0,2,"%s",pageName.c_str());
     for (int i = 0; i < menuEntries.size(); ++i) {
         std::string value = menuEntries[i].getName();
 
@@ -111,11 +110,12 @@ void MenuPage::display() {
         }
 
         if(selectedEntry == i){
-            wattron(window,COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
+            wattron(contentWindow, COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
         }
-        mvwprintw(window,i+2, textPosition, "[ %s%s]", value.c_str(), offset.c_str());
-        wattroff(window,COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
+        mvwprintw(contentWindow, i + 2, textPosition, "[ %s%s]", value.c_str(), offset.c_str());
+        wattroff(contentWindow, COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
     }
+    Page::display();
 }
 
 void MenuPage::updateSize() {
@@ -126,7 +126,7 @@ void MenuPage::destroy() {
     Page::destroy();
 }
 
-/** Triggers an event on the Box
+/** Triggers an event on the Page
  *
  * @param eventType The event being triggered
  * @param changePageCallback A callback for changing the currently displayed page
