@@ -24,7 +24,7 @@ public:
     void updateSize() override;
     void destroy() override;
 
-    void triggerEvent(Page::event eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
 
 private:
     std::array<int, 2> calculateWindowDimensions();

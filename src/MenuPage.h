@@ -27,7 +27,7 @@ public:
 
     void setDestinationPage(int entryNumber, Page *pagePointer);
     void setDestinationPageByName(const std::string &name, Page *pagePointer);
-    void triggerEvent(Page::event eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
 private:
     int getLargestLength(std::vector<MenuEntry> entries);
     MenuEntry* getEntryWithName(const std::string& name);

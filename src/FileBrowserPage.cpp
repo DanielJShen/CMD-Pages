@@ -55,37 +55,10 @@ std::array<int, 2> FileBrowserPage::calculateWindowDimensions() {
  * @param changePageCallback A callback for changing the page to be iterated over.
  */
 void FileBrowserPage::iterate(const PageCallback &changePageCallback) {
-    input = wgetch(contentWindow);
-    if(input == 27) { // 27 = Esc code
-
-        //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
-        nodelay(contentWindow, true);
-        int count = 0;
-        do {
-            input = wgetch(contentWindow);//Gets the [ character from escape codes or ERR when ESC is pressed
-            count++;
-            usleep(10);
-        } while(input == ERR && count < 100);
-        input = wgetch(contentWindow);
-        nodelay(contentWindow, false);
-
-        if (input == 'A') { // \033[A = Up
-            triggerEvent(Page::UpKey);
-        } else if (input == 'B') { // \033[B = Down
-            triggerEvent(Page::DownKey);
-        } else if (input == ERR) { // Escape
-            changePageCallback(nullptr);
-            return;
-        }
-
-    } else if (input == 10) { // 10 = Enter
-        //TODO Do action on selection of file
-    } else if (input == KEY_RESIZE) {
-        updateSize();
-    } else {
-        return;
+    Page::event eventToBeTriggered = processInput();
+    if (eventToBeTriggered != Page::NoAction) {
+        triggerEvent(changePageCallback, eventToBeTriggered);
     }
-    display();
 }
 
 void FileBrowserPage::display() {
@@ -144,7 +117,7 @@ void FileBrowserPage::loadFiles(const std::string& path) {
  * @param eventType The event being triggered
  * @param changePageCallback A callback for changing the currently displayed page
  */
-void FileBrowserPage::triggerEvent(Page::event eventType) {
+void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
     switch (eventType) {
         case UpKey:
             if (!files.empty()) {
@@ -154,6 +127,7 @@ void FileBrowserPage::triggerEvent(Page::event eventType) {
                 }
                 selectedFile = newSelectedEntry;
             }
+            display();
             break;
         case DownKey:
             if (!files.empty()) {
@@ -163,9 +137,17 @@ void FileBrowserPage::triggerEvent(Page::event eventType) {
                 }
                 selectedFile = newSelectedEntry;
             }
+            display();
             break;
         case EnterKey:
             //TODO Do action on selection of file
+            break;
+        case EscapeKey:
+            changePageCallback(nullptr);
+            break;
+        case Resize:
+            updateSize();
+            display();
             break;
     };
 }

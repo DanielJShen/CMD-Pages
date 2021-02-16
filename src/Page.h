@@ -37,12 +37,15 @@ public:
     void setPreviousPage(Page* prevPage);
 
     enum event
-    {   EnterKey = 0,
-        EscapeKey = 1,
-        UpKey = 2,
-        DownKey = 3
+    {   NoAction = 0,
+        EnterKey = 1,
+        EscapeKey = 2,
+        UpKey = 3,
+        DownKey = 4,
+        LeftKey = 5,
+        RightKey = 6,
+        Resize = 7
     };
-    virtual void triggerEvent(Page::event eventType);
 
 
 protected:
@@ -55,6 +58,9 @@ protected:
 
     Page* previousPage{};
     std::string pageName;
+
+    Page::event processInput();
+    virtual void triggerEvent(const PageCallback &changePageCallback, Page::event eventType);
 
 };
 
