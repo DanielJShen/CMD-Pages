@@ -68,7 +68,7 @@ void Page::setPreviousPage(Page* prevPage) {
     previousPage = prevPage;
 }
 
-void Page::triggerEvent(Page::event eventType) {
+void Page::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
 
 }
 
@@ -99,4 +99,62 @@ std::array<int, 4> Page::calculateCoordinates() {
     int startY = (LINES - windowHeight) / 2;
     int startX = (COLS - windowWidth) / 2;
     return {windowHeight, windowWidth, startY, startX};
+}
+
+Page::event Page::processInput() {
+    //input = wgetch(contentWindow);
+    //if(input == 27) { // 27 = Esc code
+
+        //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
+
+    //keypad(contentWindow, TRUE);
+    notimeout(contentWindow, TRUE);
+//        nodelay(contentWindow, TRUE);
+//        intrflush(contentWindow, FALSE);
+//        int count = 0;
+//        //Gets the input and sleeps if the input is empty
+//        do {
+//            input = wgetch(contentWindow);
+//            count++;
+//            if(input == ERR) {
+//              usleep(10);
+//            }
+//        } while(input == ERR && count < 100);
+        input = wgetch(contentWindow);
+        Logger::appendMessage("Input INT: "+std::to_string(input));
+        if (input == 27) {
+            nodelay(contentWindow, TRUE);
+            int input2 = wgetch(contentWindow);
+            Logger::appendMessage("Input2 INT: "+std::to_string(input2));
+            input = wgetch(contentWindow);
+            Logger::appendMessage("Input3 INT: "+std::to_string(input));
+            nodelay(contentWindow, FALSE);
+            if (input == ERR) {
+                Logger::appendMessage("Input: Escape");
+                return Page::EscapeKey;
+            }
+        }
+
+        if (input == 'A') {
+            Logger::appendMessage("Input: KEY_UP");
+            return Page::UpKey;
+        } else if (input == 'B' ) {
+            Logger::appendMessage("Input: KEY_DOWN");
+            return Page::DownKey;
+        } else if (input == 'C') {
+            Logger::appendMessage("Input: KEY_RIGHT");
+            return Page::RightKey;
+        } else if (input == 'D') {
+            Logger::appendMessage("Input: KEY_LEFT");
+            return Page::LeftKey;
+        } else if (input == 10) { //Enter
+            Logger::appendMessage("Input: KEY_ENTER");
+            return Page::EnterKey;
+        } else if (input == KEY_RESIZE) {
+            Logger::appendMessage("Input: KEY_RESIZE");
+            return Page::Resize;
+        } else {
+            return Page::NoAction;
+        }
+    return Page::NoAction;
 }

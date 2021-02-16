@@ -54,41 +54,13 @@ int MenuPage::getLargestLength(std::vector<MenuEntry> entries) {
 
 /** This function is run in a loop to detect key presses and update the terminal.
  *
- * @param changePageCallback A callback for changing the page to be iterated over.
+ * @param changePageCallback A callback for changing which page will be iterated over.
  */
 void MenuPage::iterate(const PageCallback &changePageCallback) {
-    input = wgetch(contentWindow);
-    if(input == 27) { // 27 = Esc code
-
-        //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
-        nodelay(contentWindow, true);
-        int count = 0;
-        do {
-            input = wgetch(contentWindow);//Gets the [ character from escape codes or ERR when ESC is pressed
-            count++;
-            usleep(10);
-        } while(input == ERR && count < 100);
-        input = wgetch(contentWindow);
-        nodelay(contentWindow, false);
-
-        if (input == 'A') { // \033[A = Up
-            triggerEvent(Page::UpKey);
-        } else if (input == 'B') { // \033[B = Down
-            triggerEvent(Page::DownKey);
-        } else if (input == ERR) { // Escape
-            changePageCallback(nullptr);
-            return;
-        }
-
-    } else if (input == 10) { // 10 = Enter
-        changePageCallback(getDestinationPage());
-        return;
-    } else if (input == KEY_RESIZE) {
-        updateSize();
-    } else {
-        return;
+    Page::event eventToBeTriggered = processInput();
+    if (eventToBeTriggered != Page::NoAction) {
+        triggerEvent(changePageCallback, eventToBeTriggered);
     }
-    display();
 }
 
 void MenuPage::display() {
@@ -131,7 +103,7 @@ void MenuPage::destroy() {
  * @param eventType The event being triggered
  * @param changePageCallback A callback for changing the currently displayed page
  */
-void MenuPage::triggerEvent(Page::event eventType) {
+void MenuPage::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
     switch (eventType) {
         case UpKey:
             if (!menuEntries.empty()) {
@@ -141,6 +113,7 @@ void MenuPage::triggerEvent(Page::event eventType) {
                 }
                 selectedEntry = newSelectedEntry;
             }
+            display();
             break;
         case DownKey:
             if (!menuEntries.empty()) {
@@ -149,6 +122,20 @@ void MenuPage::triggerEvent(Page::event eventType) {
                     newSelectedEntry = 0;
                 }
                 selectedEntry = newSelectedEntry;
+            }
+            display();
+            break;
+        case Resize:
+            updateSize();
+            display();
+            break;
+        case EscapeKey:
+            changePageCallback(nullptr);
+            break;
+        case EnterKey:
+            Page* destinationPage = getDestinationPage();
+            if (destinationPage != nullptr) {
+                changePageCallback(destinationPage);
             }
             break;
     }
@@ -166,7 +153,7 @@ MenuEntry *MenuPage::getEntryWithName(const std::string& name) {
 Page* MenuPage::getDestinationPage() {
     if(menuEntries[selectedEntry].getDestinationPage() == nullptr ) {
         Logger::appendMessage("There is no destination page defined for the selected entry.");
-        throw std::runtime_error("There is no destination page defined for the selected entry.");
+        return nullptr;
     }
     return menuEntries[selectedEntry].getDestinationPage();
 }
