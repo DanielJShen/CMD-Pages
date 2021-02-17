@@ -4,7 +4,10 @@
 
 #include "Page.h"
 #include "Logger.h"
+#include "UUIDGenerator.h"
 #include <unistd.h>
+
+#include <utility>
 
 #define COLOR_GRAY 9
 #define COLOR_DARKGRAY 10
@@ -13,13 +16,14 @@
 #define BOX_COLOUR_PAIR 2
 #define BKG_COLOUR_PAIR 3
 
-Page::Page() {
-    pageName = "Box";
+Page::Page(std::string name, std::array<int, 2> windowSize) {
+    pageUUID = UUIDGenerator::generateUUID();
+    pageName = std::move(name);
     previousPage = nullptr;
     backgroundWindow = nullptr;
     contentWindow = nullptr;
-    windowWidth = 0;
-    windowHeight = 0;
+    windowWidth = windowSize[0];
+    windowHeight = windowSize[1];
 
     init_color(COLOR_GRAY,400,400,400);
     init_color(COLOR_DARKGRAY,170,170,170);
@@ -32,6 +36,12 @@ Page::Page() {
     init_pair(5,COLOR_BLUE,COLOR_DARKGRAY);  //BOX_DIRECTORY_COLOUR_PAIR
     init_pair(6,COLOR_GREEN,COLOR_GRAY);     //BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR
     init_pair(7,COLOR_GREEN,COLOR_DARKGRAY); //BOX_EXECUTABLE_COLOUR_PAIR
+
+    createWindows(windowWidth, windowHeight);
+}
+
+std::string Page::getName() {
+    return pageName;
 }
 
 /** Creates the Curses windows, this is required in order to display anything.
@@ -58,6 +68,10 @@ void Page::createWindows(int width, int height) {
  * @param changePageCallback A callback for changing the page to be iterated over.
  */
 void Page::iterate(const PageCallback &changePageCallback) {
+    Page::event eventToBeTriggered = processInput();
+    if (eventToBeTriggered != Page::NoAction) {
+        triggerEvent(changePageCallback, eventToBeTriggered);
+    }
 }
 
 Page* Page::getPreviousPage() {
@@ -69,7 +83,9 @@ void Page::setPreviousPage(Page* prevPage) {
 }
 
 void Page::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
-
+    if (eventType == EscapeKey) {
+            changePageCallback(nullptr);
+    }
 }
 
 void Page::display() {
@@ -102,59 +118,30 @@ std::array<int, 4> Page::calculateCoordinates() {
 }
 
 Page::event Page::processInput() {
-    //input = wgetch(contentWindow);
-    //if(input == 27) { // 27 = Esc code
-
-        //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
-
-    //keypad(contentWindow, TRUE);
     notimeout(contentWindow, TRUE);
-//        nodelay(contentWindow, TRUE);
-//        intrflush(contentWindow, FALSE);
-//        int count = 0;
-//        //Gets the input and sleeps if the input is empty
-//        do {
-//            input = wgetch(contentWindow);
-//            count++;
-//            if(input == ERR) {
-//              usleep(10);
-//            }
-//        } while(input == ERR && count < 100);
+    input = wgetch(contentWindow);
+    if (input == 27) { // 27 is the escape code
+        nodelay(contentWindow, TRUE);
+        wgetch(contentWindow);
         input = wgetch(contentWindow);
-        Logger::appendMessage("Input INT: "+std::to_string(input));
-        if (input == 27) {
-            nodelay(contentWindow, TRUE);
-            int input2 = wgetch(contentWindow);
-            Logger::appendMessage("Input2 INT: "+std::to_string(input2));
-            input = wgetch(contentWindow);
-            Logger::appendMessage("Input3 INT: "+std::to_string(input));
-            nodelay(contentWindow, FALSE);
-            if (input == ERR) {
-                Logger::appendMessage("Input: Escape");
-                return Page::EscapeKey;
-            }
+        nodelay(contentWindow, FALSE);
+        if (input == ERR) {
+            return Page::EscapeKey;
         }
-
-        if (input == 'A') {
-            Logger::appendMessage("Input: KEY_UP");
-            return Page::UpKey;
-        } else if (input == 'B' ) {
-            Logger::appendMessage("Input: KEY_DOWN");
-            return Page::DownKey;
-        } else if (input == 'C') {
-            Logger::appendMessage("Input: KEY_RIGHT");
-            return Page::RightKey;
-        } else if (input == 'D') {
-            Logger::appendMessage("Input: KEY_LEFT");
-            return Page::LeftKey;
-        } else if (input == 10) { //Enter
-            Logger::appendMessage("Input: KEY_ENTER");
-            return Page::EnterKey;
-        } else if (input == KEY_RESIZE) {
-            Logger::appendMessage("Input: KEY_RESIZE");
-            return Page::Resize;
-        } else {
-            return Page::NoAction;
-        }
-    return Page::NoAction;
+    }
+    if (input == 'A') {
+        return Page::UpKey;
+    } else if (input == 'B' ) {
+        return Page::DownKey;
+    } else if (input == 'C') {
+        return Page::RightKey;
+    } else if (input == 'D') {
+        return Page::LeftKey;
+    } else if (input == 10) {
+        return Page::EnterKey;
+    } else if (input == KEY_RESIZE) {
+        return Page::Resize;
+    } else {
+        return Page::NoAction;
+    }
 }

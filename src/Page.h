@@ -21,7 +21,7 @@ class Page {
 public:
     typedef std::function<void(Page*)> PageCallback;
 
-    Page();
+    Page(std::string name, std::array<int, 2> windowSize);
 
     int input{};
     virtual void iterate(const PageCallback &changePageCallback);
@@ -29,8 +29,9 @@ public:
     virtual void display();
     virtual void updateSize();
     virtual void destroy();
-    void createWindows(int width, int height);
 
+
+    std::string getName();
 //    void setColours(Colour background, Colour foreground, Colour highlightedBackground, Colour highlightedForeground);
 
     Page* getPreviousPage();
@@ -55,8 +56,10 @@ protected:
     WINDOW* backgroundWindow;
 
     std::array<int,4> calculateCoordinates();
+    void createWindows(int width, int height);
 
     Page* previousPage{};
+    int pageUUID;
     std::string pageName;
 
     Page::event processInput();

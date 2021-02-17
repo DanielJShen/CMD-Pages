@@ -16,7 +16,6 @@ public:
     void startPageLoop(Page* initialPage);
     void changePage(Page* page);
 
-    Page* initialPage;
     Page* currentPage;
     bool continuePageLoop = true;
 };

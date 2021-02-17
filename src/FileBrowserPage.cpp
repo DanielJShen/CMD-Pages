@@ -11,31 +11,21 @@
 #define BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR 6
 #define BOX_EXECUTABLE_COLOUR_PAIR 7
 
-FileBrowserPage::FileBrowserPage(const std::string& name, const std::string& path) : Page() {
-    pageName = name;
+FileBrowserPage::FileBrowserPage(std::string name, const std::string& path) : Page(name,calculateWindowDimensions(path,".*")) {
     selectedFile = 0;
     directoryPath = path;
-    fileFilter = ".*";
-
-    loadFiles(directoryPath);
-
-    auto [width,height] = calculateWindowDimensions();
-    createWindows(width, height);
+    discoveredFiles = loadFiles(directoryPath, ".*");
 }
 
-FileBrowserPage::FileBrowserPage(const std::string& name, const std::string& path, const std::string& filter) : Page() {
-    pageName = name;
+FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter) : Page(name,calculateWindowDimensions(path,filter)) {
     selectedFile = 0;
     directoryPath = path;
-    fileFilter = filter;
-
-    loadFiles(directoryPath);
-
-    auto [width,height] = calculateWindowDimensions();
-    createWindows(width, height);
+    discoveredFiles = loadFiles(directoryPath, filter);
 }
 
-std::array<int, 2> FileBrowserPage::calculateWindowDimensions() {
+std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string& path, const std::string& filter) {
+    std::vector<std::filesystem::directory_entry> files = loadFiles(path, filter);
+
     int highestLength = 0;
     int fileCount = 0;
     for (auto& file : files) {
@@ -50,23 +40,12 @@ std::array<int, 2> FileBrowserPage::calculateWindowDimensions() {
     return {width,height};
 }
 
-/** This function is run in a loop to detect key presses and update the terminal.
- *
- * @param changePageCallback A callback for changing the page to be iterated over.
- */
-void FileBrowserPage::iterate(const PageCallback &changePageCallback) {
-    Page::event eventToBeTriggered = processInput();
-    if (eventToBeTriggered != Page::NoAction) {
-        triggerEvent(changePageCallback, eventToBeTriggered);
-    }
-}
-
 void FileBrowserPage::display() {
     //mvwprintw(contentWindow,0,2,"%s",boxName.c_str());
     mvwprintw(contentWindow,2,4,"%s",directoryPath.c_str());
-    for (int i = 0; i < files.size(); i++) {
-        std::string filename = files[i].path().filename();
-        bool isDirectory = files[i].is_directory();
+    for (int i = 0; i < discoveredFiles.size(); i++) {
+        std::string filename = discoveredFiles[i].path().filename();
+        bool isDirectory = discoveredFiles[i].is_directory();
         if(selectedFile == i){
             if (isDirectory) {
                 wattron(contentWindow, COLOR_PAIR(BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR));
@@ -90,11 +69,11 @@ void FileBrowserPage::destroy() {
     Page::destroy();
 }
 
-void FileBrowserPage::loadFiles(const std::string& path) {
+std::vector<std::filesystem::directory_entry> FileBrowserPage::loadFiles(const std::string& path,const std::string& fileFilter) {
     std::string absolutePath = std::regex_replace(path,std::regex("^\\."),std::filesystem::current_path().string());
     Logger::appendMessage("File Browser - Absolute Path: "+absolutePath);
 
-    files = {};
+    std::vector<std::filesystem::directory_entry> files = {};
     if (fileFilter == ".*") {
         for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(absolutePath)) {
             Logger::appendMessage("File Browser - File Found: "+entry.path().filename().string()+" Regex Match: "+ std::to_string(std::regex_match(entry.path().filename().string(), std::regex(fileFilter))) );
@@ -110,6 +89,7 @@ void FileBrowserPage::loadFiles(const std::string& path) {
             }
         }
     }
+    return files;
 }
 
 /** Triggers an event on the Box
@@ -120,19 +100,19 @@ void FileBrowserPage::loadFiles(const std::string& path) {
 void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
     switch (eventType) {
         case UpKey:
-            if (!files.empty()) {
+            if (!discoveredFiles.empty()) {
                 int newSelectedEntry = selectedFile - 1;
                 if(newSelectedEntry < 0){
-                    newSelectedEntry = (int)files.size() - 1;
+                    newSelectedEntry = (int)discoveredFiles.size() - 1;
                 }
                 selectedFile = newSelectedEntry;
             }
             display();
             break;
         case DownKey:
-            if (!files.empty()) {
+            if (!discoveredFiles.empty()) {
                 int newSelectedEntry = selectedFile + 1;
-                if(newSelectedEntry >= files.size()){
+                if(newSelectedEntry >= discoveredFiles.size()){
                     newSelectedEntry = 0;
                 }
                 selectedFile = newSelectedEntry;

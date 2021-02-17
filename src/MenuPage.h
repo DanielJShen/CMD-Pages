@@ -6,7 +6,6 @@
 #define CMDPAGES_MENUPAGE_H
 
 #include "Page.h"
-#include "MenuEntry.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -16,26 +15,22 @@
  */
 class MenuPage : public Page {
 public:
-    MenuPage(std::string name, std::vector<MenuEntry> entries);
-    MenuPage(std::string name, const std::vector<std::string>& entries);
-
-    void iterate(const PageCallback &changePageCallback) override;
+    MenuPage(std::string name, std::vector<Page*> pages);
 
     void display() override;
     void updateSize() override;
     void destroy() override;
 
-    void setDestinationPage(int entryNumber, Page *pagePointer);
-    void setDestinationPageByName(const std::string &name, Page *pagePointer);
     void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
 private:
-    int getLargestLength(std::vector<MenuEntry> entries);
-    MenuEntry* getEntryWithName(const std::string& name);
-    int getSelected() const;
-    std::vector<MenuEntry> menuEntries;
+    std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::vector<Page*>& pages);
+    int getLargestPageNameLength(const std::string& name, const std::vector<Page*>& entries);
+    Page* getPageWithName(const std::string& name);
+    int getSelected();
+    std::vector<Page*> availablePages;
     int selectedEntry;
 
-    Page *getDestinationPage();
+    Page* getPagePointerForSelectedMenuEntry();
 };
 
 #endif //CMDPAGES_MENUPAGE_H
