@@ -5,6 +5,7 @@
 #include "PagesDisplayLoop.h"
 
 PagesDisplayLoop::PagesDisplayLoop() {
+    Logger::initLogger("CMDPages.log");
     init();
 }
 
@@ -27,7 +28,6 @@ void PagesDisplayLoop::init(){
 }
 
 void PagesDisplayLoop::startPageLoop(Page* initialPage){
-    this->initialPage = initialPage;
     currentPage = initialPage;
 
     curs_set(0);
@@ -56,10 +56,12 @@ void PagesDisplayLoop::changePage(Page* page) {
     if (page != nullptr) {
         page->setPreviousPage(currentPage);
         currentPage = dynamic_cast<Page *>(page);
+        currentPage->updateSize();
         currentPage->display();
     } else {
         if (currentPage->getPreviousPage() != nullptr) {
             currentPage = (Page *) currentPage->getPreviousPage();
+            currentPage->updateSize();
             currentPage->display();
         } else {
             continuePageLoop = false;
