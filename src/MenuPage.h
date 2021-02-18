@@ -21,7 +21,6 @@ public:
     void updateSize() override;
     void destroy() override;
 
-    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
 private:
     std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::vector<Page*>& pages);
     int getLargestPageNameLength(const std::string& name, const std::vector<Page*>& entries);
@@ -30,6 +29,7 @@ private:
     std::vector<Page*> availablePages;
     int selectedEntry;
 
+    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
     Page* getPagePointerForSelectedMenuEntry();
 };
 

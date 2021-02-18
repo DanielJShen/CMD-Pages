@@ -22,8 +22,6 @@ public:
     void updateSize() override;
     void destroy() override;
 
-    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
-
 private:
     std::array<int, 2> calculateWindowDimensions(const std::string& path, const std::string& filter);
     std::string directoryPath;
@@ -31,6 +29,7 @@ private:
     int selectedFile;
     std::vector<std::filesystem::directory_entry> loadFiles(const std::string& path, const std::string& fileFilter);
 
+    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
     Page *getDestinationPage();
 };
 
