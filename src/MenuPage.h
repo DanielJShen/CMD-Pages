@@ -29,7 +29,7 @@ private:
     std::vector<Page*> availablePages;
     int selectedEntry;
 
-    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) override;
     Page* getPagePointerForSelectedMenuEntry();
 };
 

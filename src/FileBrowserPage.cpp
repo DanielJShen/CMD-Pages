@@ -3,6 +3,7 @@
 //
 
 #include "FileBrowserPage.h"
+#include "FileSystemReader.h"
 #include <unistd.h>
 
 #define BOX_HIGHLIGHT_COLOUR_PAIR 1
@@ -14,17 +15,17 @@
 FileBrowserPage::FileBrowserPage(std::string name, const std::string& path) : Page(name,calculateWindowDimensions(path,".*")) {
     selectedFile = 0;
     directoryPath = path;
-    discoveredFiles = loadFiles(directoryPath, ".*");
+    discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, ".*");
 }
 
 FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter) : Page(name,calculateWindowDimensions(path,filter)) {
     selectedFile = 0;
     directoryPath = path;
-    discoveredFiles = loadFiles(directoryPath, filter);
+    discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, filter);
 }
 
 std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string& path, const std::string& filter) {
-    std::vector<std::filesystem::directory_entry> files = loadFiles(path, filter);
+    std::vector<std::filesystem::directory_entry> files = FileSystemReader::getDirectoryContents(path, filter);
 
     int highestLength = 0;
     int fileCount = 0;
@@ -41,7 +42,6 @@ std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string&
 }
 
 void FileBrowserPage::display() {
-    //mvwprintw(contentWindow,0,2,"%s",boxName.c_str());
     mvwprintw(contentWindow,2,4,"%s",directoryPath.c_str());
     for (int i = 0; i < discoveredFiles.size(); i++) {
         std::string filename = discoveredFiles[i].path().filename();
@@ -69,37 +69,14 @@ void FileBrowserPage::destroy() {
     Page::destroy();
 }
 
-std::vector<std::filesystem::directory_entry> FileBrowserPage::loadFiles(const std::string& path,const std::string& fileFilter) {
-    std::string absolutePath = std::regex_replace(path,std::regex("^\\."),std::filesystem::current_path().string());
-    Logger::appendMessage("File Browser - Absolute Path: "+absolutePath);
-
-    std::vector<std::filesystem::directory_entry> files = {};
-    if (fileFilter == ".*") {
-        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(absolutePath)) {
-            Logger::appendMessage("File Browser - File Found: "+entry.path().filename().string()+" Regex Match: "+ std::to_string(std::regex_match(entry.path().filename().string(), std::regex(fileFilter))) );
-                files.push_back(entry);
-        }
-    } else {
-        for (const std::filesystem::directory_entry &entry : std::filesystem::directory_iterator(absolutePath)) {
-            Logger::appendMessage("File Browser - File Found: " + entry.path().filename().string() + " Regex Match: " +
-                                  std::to_string(
-                                          std::regex_match(entry.path().filename().string(), std::regex(fileFilter))));
-            if (std::regex_match(entry.path().filename().string(), std::regex(fileFilter))) {
-                files.push_back(entry);
-            }
-        }
-    }
-    return files;
-}
-
-/** Triggers an event on the Box
+/** Triggers an inputEvent on the Box
  *
- * @param eventType The event being triggered
+ * @param eventType The inputEvent being triggered
  * @param changePageCallback A callback for changing the currently displayed page
  */
-void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
+void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) {
     switch (eventType) {
-        case UpKey:
+        case InputProcessor::UpKey:
             if (!discoveredFiles.empty()) {
                 int newSelectedEntry = selectedFile - 1;
                 if(newSelectedEntry < 0){
@@ -109,7 +86,7 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Page:
             }
             display();
             break;
-        case DownKey:
+        case InputProcessor::DownKey:
             if (!discoveredFiles.empty()) {
                 int newSelectedEntry = selectedFile + 1;
                 if(newSelectedEntry >= discoveredFiles.size()){
@@ -119,13 +96,13 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Page:
             }
             display();
             break;
-        case EnterKey:
+        case InputProcessor::EnterKey:
             //TODO Do action on selection of file
             break;
-        case EscapeKey:
+        case InputProcessor::EscapeKey:
             changePageCallback(nullptr);
             break;
-        case Resize:
+        case InputProcessor::Resize:
             updateSize();
             display();
             break;

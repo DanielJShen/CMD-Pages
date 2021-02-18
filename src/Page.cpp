@@ -68,8 +68,8 @@ void Page::createWindows(int width, int height) {
  * @param changePageCallback A callback for changing the page to be iterated over.
  */
 void Page::iterate(const PageCallback &changePageCallback) {
-    Page::event eventToBeTriggered = processInput();
-    if (eventToBeTriggered != Page::NoAction) {
+    InputProcessor::inputEvent eventToBeTriggered = InputProcessor::processInput();
+    if (eventToBeTriggered != InputProcessor::NoAction) {
         triggerEvent(changePageCallback, eventToBeTriggered);
     }
 }
@@ -82,8 +82,8 @@ void Page::setPreviousPage(Page* prevPage) {
     previousPage = prevPage;
 }
 
-void Page::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
-    if (eventType == EscapeKey) {
+void Page::triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) {
+    if (eventType == InputProcessor::EscapeKey) {
             changePageCallback(nullptr);
     }
 }
@@ -115,33 +115,4 @@ std::array<int, 4> Page::calculateCoordinates() {
     int startY = (LINES - windowHeight) / 2;
     int startX = (COLS - windowWidth) / 2;
     return {windowHeight, windowWidth, startY, startX};
-}
-
-Page::event Page::processInput() {
-    notimeout(contentWindow, TRUE);
-    input = wgetch(contentWindow);
-    if (input == 27) { // 27 is the escape code
-        nodelay(contentWindow, TRUE);
-        wgetch(contentWindow);
-        input = wgetch(contentWindow);
-        nodelay(contentWindow, FALSE);
-        if (input == ERR) {
-            return Page::EscapeKey;
-        }
-    }
-    if (input == 'A') {
-        return Page::UpKey;
-    } else if (input == 'B' ) {
-        return Page::DownKey;
-    } else if (input == 'C') {
-        return Page::RightKey;
-    } else if (input == 'D') {
-        return Page::LeftKey;
-    } else if (input == 10) {
-        return Page::EnterKey;
-    } else if (input == KEY_RESIZE) {
-        return Page::Resize;
-    } else {
-        return Page::NoAction;
-    }
 }

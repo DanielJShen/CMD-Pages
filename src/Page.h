@@ -11,11 +11,13 @@
 #include <functional>
 #include <curses.h>
 #include <array>
+#include "InputProcessor.h"
 using namespace std::placeholders;
 
 /** An empty page.
- * This object contains Box's which draw a set background onto the terminal, implement this class to add functionality.
- * It has the variable previousPage to be used to know which page to show when this one is closed
+ * This object draws an empty box onto the terminal, extend this class to add functionality.
+ * The class is responsible for displaying the background and storing a pointer to the previous page,
+ * so that the page at the pointer can be used when this one is closed.
  */
 class Page {
 public:
@@ -23,7 +25,6 @@ public:
 
     Page(std::string name, std::array<int, 2> windowSize);
 
-    int input{};
     virtual void iterate(const PageCallback &changePageCallback);
 
     virtual void display();
@@ -36,17 +37,6 @@ public:
 
     Page* getPreviousPage();
     void setPreviousPage(Page* prevPage);
-
-    enum event
-    {   NoAction = 0,
-        EnterKey = 1,
-        EscapeKey = 2,
-        UpKey = 3,
-        DownKey = 4,
-        LeftKey = 5,
-        RightKey = 6,
-        Resize = 7
-    };
 
 
 protected:
@@ -62,8 +52,7 @@ protected:
     int pageUUID;
     std::string pageName;
 
-    Page::event processInput();
-    virtual void triggerEvent(const PageCallback &changePageCallback, Page::event eventType);
+    virtual void triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType);
 
 };
 

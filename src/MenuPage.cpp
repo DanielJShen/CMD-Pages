@@ -39,7 +39,6 @@ int MenuPage::getLargestPageNameLength(const std::string& name, const std::vecto
 }
 
 void MenuPage::display() {
-    //mvwprintw(contentWindow,0,2,"%s",pageName.c_str());
     for (int i = 0; i < availablePages.size(); i++) {
         std::string value = availablePages[i]->getName();
 
@@ -73,14 +72,14 @@ void MenuPage::destroy() {
     Page::destroy();
 }
 
-/** Triggers an event on the Page
+/** Triggers an inputEvent on the Page
  *
- * @param eventType The event being triggered
+ * @param eventType The inputEvent being triggered
  * @param changePageCallback A callback for changing the currently displayed page
  */
-void MenuPage::triggerEvent(const PageCallback &changePageCallback, Page::event eventType) {
+void MenuPage::triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) {
     switch (eventType) {
-        case UpKey:
+        case InputProcessor::UpKey:
             if (!availablePages.empty()) {
                 int newSelectedEntry = selectedEntry - 1;
                 if(newSelectedEntry < 0){
@@ -90,7 +89,7 @@ void MenuPage::triggerEvent(const PageCallback &changePageCallback, Page::event 
             }
             display();
             break;
-        case DownKey:
+        case InputProcessor::DownKey:
             if (!availablePages.empty()) {
                 int newSelectedEntry = selectedEntry + 1;
                 if(newSelectedEntry >= availablePages.size()){
@@ -100,14 +99,14 @@ void MenuPage::triggerEvent(const PageCallback &changePageCallback, Page::event 
             }
             display();
             break;
-        case Resize:
+        case InputProcessor::Resize:
             updateSize();
             display();
             break;
-        case EscapeKey:
+        case InputProcessor::EscapeKey:
             changePageCallback(nullptr);
             break;
-        case EnterKey:
+        case InputProcessor::EnterKey:
             Page* destinationPage = getPagePointerForSelectedMenuEntry();
             if (destinationPage != nullptr) {
                 changePageCallback(destinationPage);

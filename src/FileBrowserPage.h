@@ -27,9 +27,8 @@ private:
     std::string directoryPath;
     std::vector<std::filesystem::directory_entry> discoveredFiles;
     int selectedFile;
-    std::vector<std::filesystem::directory_entry> loadFiles(const std::string& path, const std::string& fileFilter);
 
-    void triggerEvent(const PageCallback &changePageCallback, Page::event eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) override;
     Page *getDestinationPage();
 };
 
