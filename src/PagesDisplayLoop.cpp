@@ -14,10 +14,6 @@ void PagesDisplayLoop::init(){
     initscr();
     cbreak();
 
-//    keypad(stdscr, TRUE);
-//    intrflush(stdscr, FALSE);
-//    nodelay(stdscr, TRUE);
-
     if(has_colors() == FALSE) {
         endwin();
         printf("Your terminal does not support color\n");
