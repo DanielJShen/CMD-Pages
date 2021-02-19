@@ -7,7 +7,7 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
-set(SOURCES src/Page.h src/Page.cpp src/FileBrowserPage.h src/FileBrowserPage.cpp src/MenuPage.h src/MenuPage.cpp src/Logger.h src/Logger.cpp src/PagesDisplayLoop.h src/PagesDisplayLoop.cpp src/UUIDGenerator.cpp src/UUIDGenerator.h src/FileSystemReader.cpp src/FileSystemReader.h src/InputProcessor.cpp src/InputProcessor.h)
+set(SOURCES src/Page.h src/Page.cpp src/FileBrowserPage.h src/FileBrowserPage.cpp src/MenuPage.h src/MenuPage.cpp src/Logger.h src/Logger.cpp src/PagesDisplayLoop.h src/PagesDisplayLoop.cpp src/UUIDGenerator.cpp src/UUIDGenerator.h src/FileSystemReader.cpp src/FileSystemReader.h src/IInputProcessor.h src/BlockingInputProcessor.cpp src/BlockingInputProcessor.h)
 
 add_library(${PROJECT_NAME}_lib STATIC ${SOURCES})
 add_executable(${PROJECT_NAME} src/main.cpp)

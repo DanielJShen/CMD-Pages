@@ -15,8 +15,8 @@
 
 class FileBrowserPage : public Page {
 public:
-    FileBrowserPage(std::string name, const std::string &path);
-    FileBrowserPage(std::string name, const std::string &path, const std::string &filter);
+    FileBrowserPage(std::string name, const std::string &path, IInputProcessor& inputProcessor);
+    FileBrowserPage(std::string name, const std::string &path, const std::string &filter, IInputProcessor& inputProcessor);
 
     void display() override;
     void updateSize() override;
@@ -28,7 +28,7 @@ private:
     std::vector<std::filesystem::directory_entry> discoveredFiles;
     int selectedFile;
 
-    void triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) override;
     Page *getDestinationPage();
 };
 

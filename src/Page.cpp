@@ -5,7 +5,7 @@
 #include "Page.h"
 #include "Logger.h"
 #include "UUIDGenerator.h"
-#include <unistd.h>
+#include "BlockingInputProcessor.h"
 
 #include <utility>
 
@@ -16,8 +16,9 @@
 #define BOX_COLOUR_PAIR 2
 #define BKG_COLOUR_PAIR 3
 
-Page::Page(std::string name, std::array<int, 2> windowSize) {
+Page::Page(std::string name, std::array<int, 2> windowSize, IInputProcessor& inputProcessor) : m_inputProcessor(inputProcessor) {
     pageUUID = UUIDGenerator::generateUUID();
+    Logger::appendMessage("UUID:"+std::to_string(pageUUID));
     pageName = std::move(name);
     previousPage = nullptr;
     backgroundWindow = nullptr;
@@ -68,8 +69,8 @@ void Page::createWindows(int width, int height) {
  * @param changePageCallback A callback for changing the page to be iterated over.
  */
 void Page::iterate(const PageCallback &changePageCallback) {
-    InputProcessor::inputEvent eventToBeTriggered = InputProcessor::processInput();
-    if (eventToBeTriggered != InputProcessor::NoAction) {
+    IInputProcessor::inputEvent eventToBeTriggered = m_inputProcessor.readInput();
+    if (eventToBeTriggered != IInputProcessor::NoAction) {
         triggerEvent(changePageCallback, eventToBeTriggered);
     }
 }
@@ -82,8 +83,8 @@ void Page::setPreviousPage(Page* prevPage) {
     previousPage = prevPage;
 }
 
-void Page::triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) {
-    if (eventType == InputProcessor::EscapeKey) {
+void Page::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
+    if (eventType == IInputProcessor::EscapeKey) {
             changePageCallback(nullptr);
     }
 }
