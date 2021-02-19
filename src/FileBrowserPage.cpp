@@ -6,19 +6,21 @@
 #include "FileSystemReader.h"
 #include <unistd.h>
 
+#include <utility>
+
 #define BOX_HIGHLIGHT_COLOUR_PAIR 1
 #define BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR 4
 #define BOX_DIRECTORY_COLOUR_PAIR 5
 #define BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR 6
 #define BOX_EXECUTABLE_COLOUR_PAIR 7
 
-FileBrowserPage::FileBrowserPage(std::string name, const std::string& path) : Page(name,calculateWindowDimensions(path,".*")) {
+FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, IInputProcessor& inputProcessor) : Page(std::move(name),calculateWindowDimensions(path,".*"),inputProcessor) {
     selectedFile = 0;
     directoryPath = path;
     discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, ".*");
 }
 
-FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter) : Page(name,calculateWindowDimensions(path,filter)) {
+FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter, IInputProcessor& inputProcessor) : Page(std::move(name),calculateWindowDimensions(path,filter),inputProcessor) {
     selectedFile = 0;
     directoryPath = path;
     discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, filter);
@@ -74,9 +76,9 @@ void FileBrowserPage::destroy() {
  * @param eventType The inputEvent being triggered
  * @param changePageCallback A callback for changing the currently displayed page
  */
-void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) {
+void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
     switch (eventType) {
-        case InputProcessor::UpKey:
+        case IInputProcessor::UpKey:
             if (!discoveredFiles.empty()) {
                 int newSelectedEntry = selectedFile - 1;
                 if(newSelectedEntry < 0){
@@ -86,7 +88,7 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Input
             }
             display();
             break;
-        case InputProcessor::DownKey:
+        case IInputProcessor::DownKey:
             if (!discoveredFiles.empty()) {
                 int newSelectedEntry = selectedFile + 1;
                 if(newSelectedEntry >= discoveredFiles.size()){
@@ -96,13 +98,13 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, Input
             }
             display();
             break;
-        case InputProcessor::EnterKey:
+        case IInputProcessor::EnterKey:
             //TODO Do action on selection of file
             break;
-        case InputProcessor::EscapeKey:
+        case IInputProcessor::EscapeKey:
             changePageCallback(nullptr);
             break;
-        case InputProcessor::Resize:
+        case IInputProcessor::Resize:
             updateSize();
             display();
             break;

@@ -8,14 +8,8 @@
 
 class UUIDGenerator {
 
-private:
-    static int iterator;
 public:
-    static int generateUUID(){
-        int uuid = iterator;
-        iterator++;
-        return uuid;
-    }
+    static int generateUUID();
 };
 
 

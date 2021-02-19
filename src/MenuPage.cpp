@@ -15,7 +15,7 @@
 #define BOX_HIGHLIGHT_COLOUR_PAIR 1
 #define BOX_COLOUR_PAIR 2
 
-MenuPage::MenuPage(std::string name, std::vector<Page*> pages) : Page(name,calculateWindowDimensions(name,pages)) {;
+MenuPage::MenuPage(std::string name, std::vector<Page*> pages, IInputProcessor& inputProcessor) : Page(name,calculateWindowDimensions(name,pages),inputProcessor) {
     pageName = std::move(name);
     availablePages = std::move(pages);
     selectedEntry = 0;
@@ -77,9 +77,9 @@ void MenuPage::destroy() {
  * @param eventType The inputEvent being triggered
  * @param changePageCallback A callback for changing the currently displayed page
  */
-void MenuPage::triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) {
+void MenuPage::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
     switch (eventType) {
-        case InputProcessor::UpKey:
+        case IInputProcessor::UpKey:
             if (!availablePages.empty()) {
                 int newSelectedEntry = selectedEntry - 1;
                 if(newSelectedEntry < 0){
@@ -89,7 +89,7 @@ void MenuPage::triggerEvent(const PageCallback &changePageCallback, InputProcess
             }
             display();
             break;
-        case InputProcessor::DownKey:
+        case IInputProcessor::DownKey:
             if (!availablePages.empty()) {
                 int newSelectedEntry = selectedEntry + 1;
                 if(newSelectedEntry >= availablePages.size()){
@@ -99,14 +99,14 @@ void MenuPage::triggerEvent(const PageCallback &changePageCallback, InputProcess
             }
             display();
             break;
-        case InputProcessor::Resize:
+        case IInputProcessor::Resize:
             updateSize();
             display();
             break;
-        case InputProcessor::EscapeKey:
+        case IInputProcessor::EscapeKey:
             changePageCallback(nullptr);
             break;
-        case InputProcessor::EnterKey:
+        case IInputProcessor::EnterKey:
             Page* destinationPage = getPagePointerForSelectedMenuEntry();
             if (destinationPage != nullptr) {
                 changePageCallback(destinationPage);

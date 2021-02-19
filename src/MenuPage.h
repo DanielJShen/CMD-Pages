@@ -15,7 +15,7 @@
  */
 class MenuPage : public Page {
 public:
-    MenuPage(std::string name, std::vector<Page*> pages);
+    MenuPage(std::string name, std::vector<Page*> pages, IInputProcessor& inputProcessor);
 
     void display() override;
     void updateSize() override;
@@ -29,7 +29,7 @@ private:
     std::vector<Page*> availablePages;
     int selectedEntry;
 
-    void triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) override;
     Page* getPagePointerForSelectedMenuEntry();
 };
 

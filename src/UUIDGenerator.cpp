@@ -4,4 +4,7 @@
 
 #include "UUIDGenerator.h"
 
-int UUIDGenerator::iterator = 0;
+int UUIDGenerator::generateUUID() {
+    static int uuid = 0;
+    return uuid++;
+}

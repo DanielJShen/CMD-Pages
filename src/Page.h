@@ -11,19 +11,19 @@
 #include <functional>
 #include <curses.h>
 #include <array>
-#include "InputProcessor.h"
+#include <memory>
+#include "IInputProcessor.h"
 using namespace std::placeholders;
 
-/** An empty page.
- * This object draws an empty box onto the terminal, extend this class to add functionality.
- * The class is responsible for displaying the background and storing a pointer to the previous page,
+/** An empty NCurses window of variable size with a solid background, it can be extended to add functionality.
+ * The class is responsible for displaying a box and a background as well as storing a pointer to the previous page,
  * so that the page at the pointer can be used when this one is closed.
  */
 class Page {
 public:
     typedef std::function<void(Page*)> PageCallback;
 
-    Page(std::string name, std::array<int, 2> windowSize);
+    Page(std::string name, std::array<int, 2> windowSize, IInputProcessor& inputProcessor);
 
     virtual void iterate(const PageCallback &changePageCallback);
 
@@ -52,7 +52,8 @@ protected:
     int pageUUID;
     std::string pageName;
 
-    virtual void triggerEvent(const PageCallback &changePageCallback, InputProcessor::inputEvent eventType);
+    IInputProcessor& m_inputProcessor;
+    virtual void triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType);
 
 };
 
