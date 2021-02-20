@@ -23,7 +23,7 @@ find_package(GMock REQUIRED)
 include_directories(${GTEST_INCLUDE_DIR})
 include_directories(${GMOCK_INCLUDE_DIR})
 
-add_executable(${PROJECT_NAME}Test tests/MenuPageTest.cpp tests/MockInputProcessor.h)
+add_executable(${PROJECT_NAME}Test tests/MenuPageTest.cpp tests/MockInputProcessor.h tests/PageTest.cpp tests/MockCallback.h)
 target_link_libraries(${PROJECT_NAME}Test
         ${PROJECT_NAME}_lib
         ${CURSES_LIBRARIES}
