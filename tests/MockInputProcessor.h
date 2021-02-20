@@ -13,7 +13,7 @@ public:
     MOCK_METHOD0(readInput, IInputProcessor::inputEvent());
 };
 
-MockInputProcessor& UseMockInputProcessor() {
+static MockInputProcessor& UseMockInputProcessor() {
     static std::unique_ptr<MockInputProcessor> instance = std::make_unique<MockInputProcessor>();
     return *instance;
 }
