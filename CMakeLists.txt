@@ -3,6 +3,7 @@ project(CMDPages)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
@@ -18,15 +19,16 @@ target_link_libraries(${PROJECT_NAME}
 
 enable_testing()
 find_package(GTest REQUIRED)
-include(GoogleTest)
+find_package(GMock REQUIRED)
+include_directories(${GTEST_INCLUDE_DIR})
+include_directories(${GMOCK_INCLUDE_DIR})
 
-add_executable(${PROJECT_NAME}Test tests/MenuPageTest.cpp )
+add_executable(${PROJECT_NAME}Test tests/MenuPageTest.cpp tests/MockInputProcessor.h)
 target_link_libraries(${PROJECT_NAME}Test
         ${PROJECT_NAME}_lib
         ${CURSES_LIBRARIES}
         stdc++fs
+        ${GMOCK_LIBRARIES}
         GTest::GTest
         GTest::Main)
-include_directories($ENV{GMOCK_HOME}/googlemock/include)
-include_directories($ENV{GMOCK_HOME}/googletest/include)
 gtest_discover_tests(${PROJECT_NAME}Test)
