@@ -18,7 +18,7 @@
 
 Page::Page(std::string name, std::array<int, 2> windowSize, IInputProcessor& inputProcessor) : m_inputProcessor(inputProcessor) {
     pageUUID = UUIDGenerator::generateUUID();
-    Logger::appendMessage("UUID:"+std::to_string(pageUUID));
+    Logger::appendMessage("Creating page: " + name + "   UUID: "+std::to_string(pageUUID));
     pageName = std::move(name);
     previousPage = nullptr;
     backgroundWindow = nullptr;
@@ -29,14 +29,15 @@ Page::Page(std::string name, std::array<int, 2> windowSize, IInputProcessor& inp
     init_color(COLOR_GRAY,400,400,400);
     init_color(COLOR_DARKGRAY,170,170,170);
     init_color(COLOR_BLUE,0,0,800);
-    init_pair(1,COLOR_WHITE,COLOR_GRAY);     //BOX_HIGHLIGHT_COLOUR_PAIR
-    init_pair(2,COLOR_WHITE,COLOR_DARKGRAY); //BOX_COLOUR_PAIR
-    init_pair(3,COLOR_WHITE,COLOR_BLACK);    //BKG_COLOUR_PAIR
 
-    init_pair(4,COLOR_BLUE,COLOR_GRAY);      //BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR
-    init_pair(5,COLOR_BLUE,COLOR_DARKGRAY);  //BOX_DIRECTORY_COLOUR_PAIR
-    init_pair(6,COLOR_GREEN,COLOR_GRAY);     //BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR
-    init_pair(7,COLOR_GREEN,COLOR_DARKGRAY); //BOX_EXECUTABLE_COLOUR_PAIR
+    useGlobalColours = FALSE;
+    colour_background1 = COLOR_WHITE;
+    colour_background2 = COLOR_BLACK;
+    colour_box1 = COLOR_WHITE;
+    colour_box2 = COLOR_DARKGRAY;
+    colour_boxHighlighted1 = COLOR_WHITE;
+    colour_boxHighlighted2 = COLOR_GRAY;
+
 
     createWindows(windowWidth, windowHeight);
 }
@@ -51,7 +52,6 @@ std::string Page::getName() {
  * @param height Height of the displayed contentWindow
  */
 void Page::createWindows(int width, int height) {
-
     windowWidth = width;
     windowHeight = height;
 
@@ -90,6 +90,12 @@ void Page::triggerEvent(const PageCallback &changePageCallback, IInputProcessor:
 }
 
 void Page::display() {
+    if (!useGlobalColours) {
+        init_pair(3,colour_background1,colour_background2);    //BKG_COLOUR_PAIR
+        init_pair(2,colour_box1,colour_box2); //BOX_COLOUR_PAIR
+        init_pair(1,colour_boxHighlighted1,colour_boxHighlighted2);     //BOX_HIGHLIGHT_COLOUR_PAIR
+    }
+
     mvwprintw(contentWindow, 0, 2, "%s", pageName.c_str());
     redrawwin(backgroundWindow);
     redrawwin(contentWindow);
@@ -116,4 +122,26 @@ std::array<int, 4> Page::calculateCoordinates() {
     int startY = (LINES - windowHeight) / 2;
     int startX = (COLS - windowWidth) / 2;
     return {windowHeight, windowWidth, startY, startX};
+}
+
+void Page::setColours(short background1, short background2, short box1, short box2, short boxHighlighted1,
+                      short boxHighlighted2) {
+    colour_background1 = background1;
+    colour_background2 = background2;
+    colour_box1 = box1;
+    colour_box2 = box2;
+    colour_boxHighlighted1 = boxHighlighted1;
+    colour_boxHighlighted2 = boxHighlighted2;
+
+    init_pair(3,colour_background1,colour_background2);    //BKG_COLOUR_PAIR
+    init_pair(2,colour_box1,colour_box2); //BOX_COLOUR_PAIR
+    init_pair(1,colour_boxHighlighted1,colour_boxHighlighted2);     //BOX_HIGHLIGHT_COLOUR_PAIR
+}
+
+bool Page::getUseGlobalColours() {
+    return useGlobalColours;
+}
+
+void Page::setUseGlobalColours(bool val) {
+    useGlobalColours = val;
 }
