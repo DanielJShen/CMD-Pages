@@ -120,6 +120,9 @@ Page *MenuPage::getPageWithName(const std::string& name) {
 }
 
 Page* MenuPage::getPagePointerForSelectedMenuEntry() {
+    if (availablePages.empty()) {
+        return nullptr;
+    }
     if(availablePages[selectedEntry] == nullptr ) {
         Logger::appendMessage("There is no destination page defined for the selected entry.");
         return nullptr;
