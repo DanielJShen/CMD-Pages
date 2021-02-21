@@ -34,7 +34,7 @@ public:
 
     std::string getName();
 
-    /** Sets the colours to use for this page or for every page if useGlobalColours(TRUE) is called. <br><br>
+    /** Sets the colours to use for this page or for every page if useGlobalColours(TRUE) is called. The foreground colour is the colour of text. <br><br>
      * To use custom colours, use init_color from ncurses,
      * e.g. init_color(COLOR_DARKGRAY,170,170,170);
      *
@@ -52,8 +52,8 @@ public:
      *               <br> Default: COLOR_GRAY
      */
     void setColours(NCURSES_COLOR_T background1, NCURSES_COLOR_T background2, NCURSES_COLOR_T box1, NCURSES_COLOR_T box2, NCURSES_COLOR_T boxHighlighted1, NCURSES_COLOR_T boxHighlighted2);
-    void setUseGlobalColours(bool val);
-    bool getUseGlobalColours();
+    static void setUseGlobalColours(bool val);
+    static bool getUseGlobalColours();
 
     Page* getPreviousPage();
     void setPreviousPage(Page* prevPage);
@@ -71,7 +71,8 @@ protected:
     NCURSES_COLOR_T colour_box2;
     NCURSES_COLOR_T colour_boxHighlighted1;
     NCURSES_COLOR_T colour_boxHighlighted2;
-    bool useGlobalColours;
+
+    static bool useGlobalColours;
 
     std::array<int,4> calculateCoordinates();
     void createWindows(int width, int height);

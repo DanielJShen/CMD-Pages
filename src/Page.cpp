@@ -16,6 +16,8 @@
 #define BOX_COLOUR_PAIR 2
 #define BKG_COLOUR_PAIR 3
 
+bool Page::useGlobalColours = FALSE;
+
 Page::Page(std::string name, std::array<int, 2> windowSize, IInputProcessor& inputProcessor) : m_inputProcessor(inputProcessor) {
     pageUUID = UUIDGenerator::generateUUID();
     Logger::appendMessage("Creating page: " + name + "   UUID: "+std::to_string(pageUUID));
@@ -27,10 +29,8 @@ Page::Page(std::string name, std::array<int, 2> windowSize, IInputProcessor& inp
     windowHeight = windowSize[1];
 
     init_color(COLOR_GRAY,400,400,400);
-    init_color(COLOR_DARKGRAY,170,170,170);
-    init_color(COLOR_BLUE,0,0,800);
+    init_color(COLOR_DARKGRAY,220,220,220);
 
-    useGlobalColours = FALSE;
     colour_background1 = COLOR_WHITE;
     colour_background2 = COLOR_BLACK;
     colour_box1 = COLOR_WHITE;

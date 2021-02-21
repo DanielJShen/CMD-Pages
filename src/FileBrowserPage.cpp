@@ -8,22 +8,29 @@
 
 #include <utility>
 
-#define BOX_HIGHLIGHT_COLOUR_PAIR 1
-#define BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR 4
-#define BOX_DIRECTORY_COLOUR_PAIR 5
-#define BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR 6
-#define BOX_EXECUTABLE_COLOUR_PAIR 7
+#define COLOR_GRAY 9
+#define COLOR_DARKGRAY 10
+#define COLOR_LIGHTBLUE 11
 
-FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, IInputProcessor& inputProcessor) : Page(std::move(name),calculateWindowDimensions(path,".*"),inputProcessor) {
-    selectedFile = 0;
-    directoryPath = path;
-    discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, ".*");
+#define BOX_HIGHLIGHT_COLOUR_PAIR 1
+#define BOX_DIRECTORY_COLOUR_PAIR 4
+#define BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR 5
+#define BOX_EXECUTABLE_COLOUR_PAIR 6
+#define BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR 7
+
+FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, IInputProcessor& inputProcessor) : FileBrowserPage(std::move(name),path,".*",inputProcessor) {
 }
 
 FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter, IInputProcessor& inputProcessor) : Page(std::move(name),calculateWindowDimensions(path,filter),inputProcessor) {
     selectedFile = 0;
     directoryPath = path;
     discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, filter);
+
+    init_color(COLOR_LIGHTBLUE,300,600,1000);
+    colour_directory = COLOR_LIGHTBLUE;
+    colour_highlightDirectory = COLOR_LIGHTBLUE;
+    colour_executable = COLOR_GREEN;
+    colour_highlightExecutable = COLOR_GREEN;
 }
 
 std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string& path, const std::string& filter) {
@@ -44,6 +51,13 @@ std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string&
 }
 
 void FileBrowserPage::display() {
+    if (!useGlobalColours) {
+        init_pair(4,colour_directory,colour_box2);      //BOX_DIRECTORY_COLOUR_PAIR
+        init_pair(5,colour_highlightDirectory,colour_boxHighlighted2);  //BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR
+        init_pair(6,colour_executable,colour_box2);     //BOX_EXECUTABLE_COLOUR_PAIR
+        init_pair(7,colour_highlightExecutable,colour_boxHighlighted2); //BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR
+    }
+
     mvwprintw(contentWindow,2,4,"%s",directoryPath.c_str());
     for (int i = 0; i < discoveredFiles.size(); i++) {
         std::string filename = discoveredFiles[i].path().filename();
@@ -109,4 +123,16 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInpu
 Page *FileBrowserPage::getDestinationPage() {
     //TODO open a new file browser for sub dir?
     return nullptr;
+}
+
+void FileBrowserPage::setFileBrowserColours(short directory, short highlightDirectory, short executable, short highlightExecutable){
+    colour_directory = directory;
+    colour_highlightDirectory = highlightDirectory;
+    colour_executable = executable;
+    colour_highlightExecutable = highlightExecutable;
+
+    init_pair(4,colour_directory,colour_box2);
+    init_pair(5,colour_highlightDirectory,colour_boxHighlighted2);
+    init_pair(6,colour_executable,colour_box2);
+    init_pair(7,colour_highlightExecutable,colour_boxHighlighted2);
 }
