@@ -58,11 +58,3 @@ TEST (PageTest, TestNoCallback) {
         initialPage.iterate([this](auto &&PH1) { ASSERT_TRUE(FALSE); });
     }
 }
-
-/** The Unique pointer in BlockingInputProcessor should not be moved.
- */
-TEST (PageTest, CheckUniquePointerNotMoved) {
-    IInputProcessor& inputProcessor = UseBlockingInputProcessor();
-    ASSERT_NO_THROW(Page("Page1",{40,10}, inputProcessor).iterate([this](auto &&PH1) {}));
-    ASSERT_NO_THROW(Page("Page2",{40,10}, inputProcessor).iterate([this](auto &&PH1) {}));
-}

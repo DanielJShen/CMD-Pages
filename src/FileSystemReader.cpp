@@ -7,7 +7,7 @@
 #include "Logger.h"
 
 std::vector<std::filesystem::directory_entry> FileSystemReader::getDirectoryContents(const std::string& path, const std::string& fileFilter) {
-    std::string absolutePath = std::regex_replace(path,std::regex("^\\."),std::filesystem::current_path().string());
+    std::string absolutePath = std::regex_replace(path,std::regex("^\\.$"),std::filesystem::current_path().string());
     Logger::appendMessage("File Browser - Absolute Path: "+absolutePath);
 
     std::vector<std::filesystem::directory_entry> files = {};

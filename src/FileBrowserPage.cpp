@@ -71,11 +71,6 @@ void FileBrowserPage::destroy() {
     Page::destroy();
 }
 
-/** Triggers an inputEvent on the Box
- *
- * @param eventType The inputEvent being triggered
- * @param changePageCallback A callback for changing the currently displayed page
- */
 void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
     switch (eventType) {
         case IInputProcessor::UpKey:
