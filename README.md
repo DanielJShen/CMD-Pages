@@ -10,10 +10,9 @@ CMDPagesTest requires libraries: gtest, gmock
 Build commands: \
 cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages_lib
 cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPagesTest
-cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages
 
 ## Usage
-The CMDPages executable is an example menu which uses CMDPages_lib, to create your own interactive menu you can use CMDPages_lib. \
+To create your own interactive menu you can use CMDPages_lib in a C++ project. \
 CMDPagesTest can be run to test CMDPages_lib.
 
 ### CMDPages_lib
