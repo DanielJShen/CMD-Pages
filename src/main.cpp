@@ -1,93 +1,49 @@
-#include <iostream>
-#include <curses.h>
-#include <unistd.h>
 #include <vector>
-#include "ContainerPage.h"
-#include "MenuBox.h"
+#include "Page.h"
+#include "MenuPage.h"
 #include "Logger.h"
+#include "FileBrowserPage.h"
+#include "PagesDisplayLoop.h"
+#include "BlockingInputProcessor.h"
 
-void init();
-void displayPageLoop(ContainerPage containerPage);
+#define COLOR_LIGHTBLUE 11
+
+//namespace make {
+//    template<typename C> auto function(const C & obj) {
+//        return ::function<C>(obj);
+//    }
+//}
 
 int main() {
     Logger::initLogger("CMDPages.log");
-    init();
 
-    std::vector<std::string> options = {"2nd Menu","Example 1","test1","test2"};
-    MenuBox* initialMenuBox = MenuBox::makeMenuBox(options);
-    ContainerPage initialContainerPage(initialMenuBox);
+    PagesDisplayLoop pagesCore = PagesDisplayLoop();
 
-    std::vector<std::string> options2 = {"Example 2","Even Example 2","Final Example","jklmnopqr"};
-    MenuBox* menuBox2 = MenuBox::makeMenuBox(options2);
-    ContainerPage containerPage2(menuBox2);
 
-    initialMenuBox->setDestinationPageByName(std::string("2nd Menu"),&containerPage2);
+    Page testPage1 = Page("Test1",{40,10}, UseBlockingInputProcessor());
+    testPage1.setColours(COLOR_BLACK,COLOR_BLACK,COLOR_BLUE,COLOR_CYAN,COLOR_BLACK,COLOR_BLUE);
+//    Page::setUseGlobalColours(TRUE);
 
-    displayPageLoop(initialContainerPage);
+    MenuPage menuPage1 = MenuPage("Menu1", {&testPage1}, UseBlockingInputProcessor());
+    MenuPage menuPage2 = MenuPage("Menu2", {}, UseBlockingInputProcessor());
+    FileBrowserPage fileBrowserPage = FileBrowserPage("File Browser 1",".",".*", UseBlockingInputProcessor());
+    fileBrowserPage.setFileBrowserColours(COLOR_LIGHTBLUE,COLOR_LIGHTBLUE,COLOR_RED,COLOR_RED);
+
+    std::vector<std::shared_ptr<FileBrowserPage>> fileBrowserPagePointers;
+    typedef std::function<void(const std::filesystem::directory_entry&, FileBrowserPage*)> FileActionCallback;
+    FileActionCallback onDirectorySelect = [&pagesCore,&fileBrowserPagePointers,&onDirectorySelect]( const std::filesystem::directory_entry& directory, FileBrowserPage* callingObject ) {
+        std::shared_ptr<FileBrowserPage> fileBrowserPagePtr = std::make_unique<FileBrowserPage>(callingObject->getName(), directory.path(),".*", UseBlockingInputProcessor());
+        fileBrowserPagePtr->setOnSelectDirectory(&onDirectorySelect);
+        fileBrowserPagePointers.push_back(fileBrowserPagePtr);
+        pagesCore.changePage(fileBrowserPagePointers.back().get());
+    };
+    fileBrowserPage.setOnSelectDirectory(&onDirectorySelect);
+
+    MenuPage initialPage = MenuPage("Main Menu", {&menuPage1,&menuPage2,&fileBrowserPage}, UseBlockingInputProcessor());
+    pagesCore.startPageLoop(&initialPage);
 
     return 0;
 }
 
-void init(){
-    initscr();
-    cbreak();
-
-    if(has_colors() == FALSE) {
-        endwin();
-        printf("Your terminal does not support color\n");
-        exit(1);
-    }
-    start_color();
-    wrefresh(stdscr);
-}
-
-void displayPageLoop(ContainerPage containerPage){
-    curs_set(0);
-    noecho();
-    cbreak();
-    containerPage.display();
-
-    ContainerPage* currentPage = &containerPage;
-    int input;
-    while(true) {
-        auto * menuBox = (MenuBox*) currentPage->getBox();
-        input = wgetch(menuBox->window);
-        if(input == 27) { // 27 = Esc code
-
-            //Code block is equivalent to keypad mode in getch but with a shorter wait when pressing ESC
-            nodelay(menuBox->window,true);
-            int count = 0;
-            do {
-                input = wgetch(menuBox->window);//Gets the [ character from escape codes or ERR when ESC is pressed
-                count++;
-                usleep(10);
-            } while(input == ERR && count < 100);
-            input = wgetch(menuBox->window);
-            nodelay(menuBox->window,false);
-
-            if (input == 'A') { // \033[A = Up
-                menuBox->moveSelectionUp();
-            } else if (input == 'B') { // \033[B = Down
-                menuBox->moveSelectionDown();
-            } else if (input == ERR) { // No input
-                if (currentPage->getPreviousPage() != nullptr) {
-                    currentPage = (ContainerPage *) currentPage->getPreviousPage();
-                } else {
-                    break;
-                }
-            }
-
-        } else if (input == 10) { // 10 = Enter
-            try {
-                ContainerPage *page = menuBox->getDestinationPage();
-                page->setPreviousPage(currentPage);
-                currentPage = page;
-            } catch (const std::runtime_error &e) {
-                printf("Error: %s\r", e.what());
-            }
-        }
-        currentPage->display();
-    }
-    endwin();
-    printf("\n");
+void onDirectorySelect(const std::filesystem::directory_entry& directory, FileBrowserPage* callingObject){
 }
