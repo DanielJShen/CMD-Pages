@@ -1,5 +1,5 @@
 # CMD-Pages
-A colourful interactive menu for the linux command line. Similar to the command 'dialog'.
+A library for a colourful interactive menu for the linux command line. Similar to the command 'dialog'.
 
 ## Building
 Build using CLion on Ubuntu 18.04
@@ -8,12 +8,12 @@ CMDPages_lib requires libraries: ncurses
 CMDPagesTest requires libraries: gtest, gmock
 
 Build commands: \
-cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages_lib
-cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPagesTest
 cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages
+cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPagesTest
+cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages_example
 
 ## Usage
-The CMDPages executable is an example menu which uses CMDPages_lib, to create your own interactive menu you can use CMDPages_lib. \
+The CMDPages_example executable is an example menu which uses the CMDPages library, to create your own interactive menu you can use CMDPages_lib. \
 CMDPagesTest can be run to test CMDPages_lib.
 
 ### CMDPages_lib
@@ -22,6 +22,7 @@ CMDPagesTest can be run to test CMDPages_lib.
 - Page
 - MenuPage
 - FileBrowserPage
+- PagesDisplayLoop
 
 Basic page setup:  
 

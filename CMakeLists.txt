@@ -10,10 +10,10 @@ include_directories(${CURSES_INCLUDE_DIR})
 
 set(SOURCES src/Page.h src/Page.cpp src/FileBrowserPage.h src/FileBrowserPage.cpp src/MenuPage.h src/MenuPage.cpp src/Logger.h src/Logger.cpp src/PagesDisplayLoop.h src/PagesDisplayLoop.cpp src/UUIDGenerator.cpp src/UUIDGenerator.h src/FileSystemReader.cpp src/FileSystemReader.h src/IInputProcessor.h src/BlockingInputProcessor.cpp src/BlockingInputProcessor.h)
 
-add_library(${PROJECT_NAME}_lib STATIC ${SOURCES})
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME}
-        ${PROJECT_NAME}_lib
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_executable(${PROJECT_NAME}_example src/main.cpp)
+target_link_libraries(${PROJECT_NAME}_example
+        ${PROJECT_NAME}
         ${CURSES_LIBRARIES}
         stdc++fs)
 
@@ -25,7 +25,7 @@ include_directories(${GMOCK_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME}Test tests/PageTest.cpp tests/MenuPageTest.cpp tests/MockInputProcessor.h tests/MockCallback.h tests/BlockingInputProcessorTest.cpp tests/FileSystemReaderTest.cpp tests/FileBrowserPageTest.cpp tests/FileBrowserPageTest.h tests/FileSystemReaderTest.h)
 target_link_libraries(${PROJECT_NAME}Test
-        ${PROJECT_NAME}_lib
+        ${PROJECT_NAME}
         ${CURSES_LIBRARIES}
         stdc++fs
         ${GMOCK_LIBRARIES}

@@ -64,7 +64,12 @@ void FileBrowserPage::display() {
     }
 
     auto currentPath = std::filesystem::current_path();
-    mvwprintw(contentWindow,2,4,"./%s",directoryPath.lexically_relative(currentPath).c_str());
+    std::string stringPath = directoryPath.lexically_relative(currentPath).string();
+    if (stringPath.find("../") != std::string::npos) {
+        mvwprintw(contentWindow, 2, 4, "%s", directoryPath.c_str());
+    } else {
+        mvwprintw(contentWindow, 2, 4, "./%s", stringPath.c_str());
+    }
     for (int i = 0; i < discoveredFiles.size(); i++) {
         std::string filename = discoveredFiles[i].path().filename();
         bool isDirectory = discoveredFiles[i].is_directory();
