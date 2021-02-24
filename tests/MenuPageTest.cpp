@@ -38,16 +38,3 @@ TEST (MenuPageTest, TestCallback) {
             .Times(AtLeast(1));
     initialPage.iterate([&mockCallback](auto &&PH1) { mockCallback.changePage(PH1); });
 }
-
-/** The Unique pointer in BlockingInputProcessor should not be moved.
- */
-TEST (MenuPageTest, CheckUniquePointerNotMoved) {
-    IInputProcessor& inputProcessor = UseBlockingInputProcessor();
-    ASSERT_NO_THROW(MenuPage("1st Menu", {}, inputProcessor).iterate([this](auto &&PH1) {}));
-    ASSERT_NO_THROW(MenuPage("2nd Menu", {}, inputProcessor).iterate([this](auto &&PH1) {}));
-}
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleMock(&argc, argv);
-    return RUN_ALL_TESTS();
-}

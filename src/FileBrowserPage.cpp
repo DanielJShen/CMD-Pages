@@ -4,6 +4,7 @@
 
 #include "FileBrowserPage.h"
 #include "FileSystemReader.h"
+#include "BlockingInputProcessor.h"
 #include <unistd.h>
 
 #include <utility>
@@ -22,8 +23,8 @@ FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, IInp
 }
 
 FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter, IInputProcessor& inputProcessor) : Page(std::move(name),calculateWindowDimensions(path,filter),inputProcessor) {
-    selectedFile = 0;
-    directoryPath = path;
+    selectedFileIndex = 0;
+    directoryPath = std::filesystem::path(path);
     discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, filter);
 
     init_color(COLOR_LIGHTBLUE,300,600,1000);
@@ -45,6 +46,10 @@ std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string&
         }
         fileCount++;
     }
+    if (path.length() > highestLength) {
+        highestLength = path.length();
+    }
+
     int width = (int) highestLength + 15;
     int height = (int) fileCount + 6;
     return {width,height};
@@ -58,11 +63,12 @@ void FileBrowserPage::display() {
         init_pair(7,colour_highlightExecutable,colour_boxHighlighted2); //BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR
     }
 
-    mvwprintw(contentWindow,2,4,"%s",directoryPath.c_str());
+    auto currentPath = std::filesystem::current_path();
+    mvwprintw(contentWindow,2,4,"./%s",directoryPath.lexically_relative(currentPath).c_str());
     for (int i = 0; i < discoveredFiles.size(); i++) {
         std::string filename = discoveredFiles[i].path().filename();
         bool isDirectory = discoveredFiles[i].is_directory();
-        if(selectedFile == i){
+        if(selectedFileIndex == i){
             if (isDirectory) {
                 wattron(contentWindow, COLOR_PAIR(BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR));
             } else {
@@ -89,26 +95,23 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInpu
     switch (eventType) {
         case IInputProcessor::UpKey:
             if (!discoveredFiles.empty()) {
-                int newSelectedEntry = selectedFile - 1;
+                int newSelectedEntry = selectedFileIndex - 1;
                 if(newSelectedEntry < 0){
                     newSelectedEntry = (int)discoveredFiles.size() - 1;
                 }
-                selectedFile = newSelectedEntry;
+                selectedFileIndex = newSelectedEntry;
             }
             display();
             break;
         case IInputProcessor::DownKey:
             if (!discoveredFiles.empty()) {
-                int newSelectedEntry = selectedFile + 1;
+                int newSelectedEntry = selectedFileIndex + 1;
                 if(newSelectedEntry >= discoveredFiles.size()){
                     newSelectedEntry = 0;
                 }
-                selectedFile = newSelectedEntry;
+                selectedFileIndex = newSelectedEntry;
             }
             display();
-            break;
-        case IInputProcessor::EnterKey:
-            //TODO Do action on selection of file
             break;
         case IInputProcessor::EscapeKey:
             changePageCallback(nullptr);
@@ -117,12 +120,26 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInpu
             updateSize();
             display();
             break;
+        case IInputProcessor::EnterKey:
+            std::filesystem::directory_entry& selectedFile = discoveredFiles.at(selectedFileIndex);
+            if (selectedFile.is_directory()) {
+                if (onSelectDirectory == nullptr) {
+                    Logger::appendMessage("'onSelectDirectory' is not set! No action performed for selecting a directory. FileBrowserPage:"+getName());
+                } else {
+                    (*onSelectDirectory)(selectedFile, this);
+                }
+            } else if (selectedFile.is_regular_file()) {
+                if (onSelectFile == nullptr) {
+                    Logger::appendMessage("'onSelectFile' is not set! No action performed for selecting a directory. FileBrowserPage:"+getName());
+                } else {
+                    (*onSelectFile)(selectedFile, this);
+                }
+            } else {
+                Logger::appendMessage("Non-regular file, unable to process correct action. Path:"+selectedFile.path().string());
+                (*onSelectFile)(selectedFile, this);
+            }
+            break;
     };
-}
-
-Page *FileBrowserPage::getDestinationPage() {
-    //TODO open a new file browser for sub dir?
-    return nullptr;
 }
 
 void FileBrowserPage::setFileBrowserColours(short directory, short highlightDirectory, short executable, short highlightExecutable){
@@ -135,4 +152,12 @@ void FileBrowserPage::setFileBrowserColours(short directory, short highlightDire
     init_pair(5,colour_highlightDirectory,colour_boxHighlighted2);
     init_pair(6,colour_executable,colour_box2);
     init_pair(7,colour_highlightExecutable,colour_boxHighlighted2);
+}
+
+void FileBrowserPage::setOnSelectDirectory(FileBrowserPage::FileActionCallback *onSelectDirectory) {
+    this->onSelectDirectory = onSelectDirectory;
+}
+
+void FileBrowserPage::setOnSelectFile(FileBrowserPage::FileActionCallback *onSelectFile) {
+    this->onSelectFile = onSelectFile;
 }

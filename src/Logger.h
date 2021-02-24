@@ -12,6 +12,8 @@ class Logger {
 public:
     static void appendMessage(const std::string& message);
     static void initLogger(std::string filePath);
+private:
+    static std::string getTime();
 };
 
 

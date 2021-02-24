@@ -58,3 +58,8 @@ TEST (PageTest, TestNoCallback) {
         initialPage.iterate([this](auto &&PH1) { ASSERT_TRUE(FALSE); });
     }
 }
+
+int main(int argc, char** argv) {
+    ::testing::InitGoogleMock(&argc, argv);
+    return RUN_ALL_TESTS();
+}
