@@ -11,11 +11,6 @@ include_directories(${CURSES_INCLUDE_DIR})
 set(SOURCES src/Page.h src/Page.cpp src/FileBrowserPage.h src/FileBrowserPage.cpp src/MenuPage.h src/MenuPage.cpp src/Logger.h src/Logger.cpp src/PagesDisplayLoop.h src/PagesDisplayLoop.cpp src/UUIDGenerator.cpp src/UUIDGenerator.h src/FileSystemReader.cpp src/FileSystemReader.h src/IInputProcessor.h src/BlockingInputProcessor.cpp src/BlockingInputProcessor.h)
 
 add_library(${PROJECT_NAME}_lib STATIC ${SOURCES})
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME}
-        ${PROJECT_NAME}_lib
-        ${CURSES_LIBRARIES}
-        stdc++fs)
 
 enable_testing()
 find_package(GTest REQUIRED)
