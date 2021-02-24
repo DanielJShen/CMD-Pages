@@ -8,16 +8,16 @@
 #include "../src/FileBrowserPage.h"
 #include "../src/BlockingInputProcessor.h"
 #include "MockInputProcessor.h"
-#include "MockCallback.h"
+#include "FileBrowserPageTest.h"
 
 using ::testing::AtLeast;
 using ::testing::Return;
 
-TEST (FileBrowserPageTest, ClassCreation) {
+TEST_F (FileBrowserPageTest, ClassCreation) {
     ASSERT_NO_THROW(FileBrowserPage("1st Menu", ".", UseBlockingInputProcessor()));
 }
 
-TEST (FileBrowserPageTest, DirectoryActionCallbackCalled) {
+TEST_F (FileBrowserPageTest, DirectoryActionCallbackCalled) {
     bool hasCallbackBeenCalled = FALSE;
     typedef std::function<void(const std::filesystem::directory_entry&, FileBrowserPage*)> FileActionCallback;
     FileActionCallback onDirectorySelect = [&hasCallbackBeenCalled]( const std::filesystem::directory_entry& directory, FileBrowserPage* callingObject ) {
@@ -36,11 +36,9 @@ TEST (FileBrowserPageTest, DirectoryActionCallbackCalled) {
 
     fileBrowserPage.iterate([](auto &&PH1) {});
     ASSERT_TRUE(hasCallbackBeenCalled);
-
-    std::filesystem::remove("/tmp/tempCMD_Pages_TempDir");
 }
 
-TEST (FileBrowserPageTest, FileActionCallbackCalled) {
+TEST_F (FileBrowserPageTest, FileActionCallbackCalled) {
     bool hasCallbackBeenCalled = FALSE;
     typedef std::function<void(const std::filesystem::directory_entry&, FileBrowserPage*)> FileActionCallback;
     FileActionCallback onFileSelect = [&hasCallbackBeenCalled]( const std::filesystem::directory_entry& directory, FileBrowserPage* callingObject ) {
@@ -52,14 +50,43 @@ TEST (FileBrowserPageTest, FileActionCallbackCalled) {
             .Times(AtLeast(1))
             .WillOnce(Return(inputProcessor.EnterKey));
 
-    std::ofstream outStream("/tmp/.testFileXXXXX");
+    std::ofstream outStream("/tmp/.tempCMD_Pages_FileXXXXX");
     outStream << "Hello, World\n" << std::endl;
 
-    FileBrowserPage fileBrowserPage = FileBrowserPage("1st Menu", "/tmp", "^\\.testFileXXXXX$", inputProcessor);
-    fileBrowserPage.setOnSelectDirectory(&onFileSelect);
+    FileBrowserPage fileBrowserPage = FileBrowserPage("1st Menu", "/tmp", "^\\.tempCMD_Pages_FileXXXXX$", inputProcessor);
+    fileBrowserPage.setOnSelectFile(&onFileSelect);
 
     fileBrowserPage.iterate([](auto &&PH1) {});
     ASSERT_TRUE(hasCallbackBeenCalled);
+}
 
-    std::remove("/tmp/.testFileXXXXX");
+TEST_F (FileBrowserPageTest, SubdirectoriesDirectoryActionCalled) {
+    MockInputProcessor& inputProcessor = UseMockInputProcessor();
+    EXPECT_CALL(inputProcessor, readInput())
+            .Times(AtLeast(2))
+            .WillOnce(Return(inputProcessor.EnterKey))
+            .WillOnce(Return(inputProcessor.EnterKey));
+
+    std::filesystem::create_directory("/tmp/tempCMD_Pages_TempDir");
+    std::filesystem::create_directory("/tmp/tempCMD_Pages_TempDir/tempCMD_Pages_TempDir");
+
+    FileBrowserPage fileBrowserPage = FileBrowserPage("1st Menu", "/tmp", "^tempCMD_Pages_TempDir$", inputProcessor);
+
+    bool hasCallbackBeenCalled = FALSE;
+    std::vector<std::shared_ptr<FileBrowserPage>> fileBrowserPagePointers;
+    typedef std::function<void(const std::filesystem::directory_entry&, FileBrowserPage*)> FileActionCallback;
+    FileActionCallback onDirectorySelect = [&hasCallbackBeenCalled,&fileBrowserPagePointers,&onDirectorySelect,&inputProcessor]( const std::filesystem::directory_entry& directory, FileBrowserPage* callingObject ) {
+        std::shared_ptr<FileBrowserPage> fileBrowserPagePtr = std::make_unique<FileBrowserPage>(callingObject->getName(), directory.path(),"^tempCMD_Pages_TempDir$", inputProcessor);
+        fileBrowserPagePtr->setOnSelectDirectory(&onDirectorySelect);
+        fileBrowserPagePointers.push_back(fileBrowserPagePtr);
+        hasCallbackBeenCalled = TRUE;
+    };
+    fileBrowserPage.setOnSelectDirectory(&onDirectorySelect);
+
+    fileBrowserPage.iterate([](auto &&PH1) {});
+    ASSERT_TRUE(hasCallbackBeenCalled);
+    hasCallbackBeenCalled = FALSE;
+    fileBrowserPagePointers.back()->iterate([](auto &&PH1) {});
+    ASSERT_TRUE(hasCallbackBeenCalled);
+    ASSERT_EQ(fileBrowserPagePointers.size(),2);
 }
