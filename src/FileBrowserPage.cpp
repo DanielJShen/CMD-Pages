@@ -121,22 +121,29 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInpu
             display();
             break;
         case IInputProcessor::EnterKey:
-            std::filesystem::directory_entry& selectedFile = discoveredFiles.at(selectedFileIndex);
-            if (selectedFile.is_directory()) {
-                if (onSelectDirectory == nullptr) {
-                    Logger::appendMessage("'onSelectDirectory' is not set! No action performed for selecting a directory. FileBrowserPage:"+getName());
+            if (!discoveredFiles.empty()) {
+                std::filesystem::directory_entry &selectedFile = discoveredFiles.at(selectedFileIndex);
+                if (selectedFile.is_directory()) {
+                    if (onSelectDirectory == nullptr) {
+                        Logger::appendMessage(
+                                "'onSelectDirectory' is not set! No action performed for selecting a directory. FileBrowserPage:" +
+                                getName());
+                    } else {
+                        (*onSelectDirectory)(selectedFile, this);
+                    }
+                } else if (selectedFile.is_regular_file()) {
+                    if (onSelectFile == nullptr) {
+                        Logger::appendMessage(
+                                "'onSelectFile' is not set! No action performed for selecting a directory. FileBrowserPage:" +
+                                getName());
+                    } else {
+                        (*onSelectFile)(selectedFile, this);
+                    }
                 } else {
-                    (*onSelectDirectory)(selectedFile, this);
-                }
-            } else if (selectedFile.is_regular_file()) {
-                if (onSelectFile == nullptr) {
-                    Logger::appendMessage("'onSelectFile' is not set! No action performed for selecting a directory. FileBrowserPage:"+getName());
-                } else {
+                    Logger::appendMessage(
+                            "Non-regular file, unable to process correct action. Path:" + selectedFile.path().string());
                     (*onSelectFile)(selectedFile, this);
                 }
-            } else {
-                Logger::appendMessage("Non-regular file, unable to process correct action. Path:"+selectedFile.path().string());
-                (*onSelectFile)(selectedFile, this);
             }
             break;
     };
