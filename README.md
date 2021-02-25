@@ -4,11 +4,11 @@ A colourful interactive menu for the linux command line. Similar to the command 
 ## Building
 Build using CLion on Ubuntu 18.04
 
-CMDPages_lib requires libraries: ncurses
+CMDPages_lib requires libraries: ncurses \
 CMDPagesTest requires libraries: gtest, gmock
 
 Build commands: \
-cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages_lib
+cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPages_lib  \
 cmake --build {PATH_TO_PROJECT}/CMD-Pages/build/ --target CMDPagesTest
 
 ## Usage
