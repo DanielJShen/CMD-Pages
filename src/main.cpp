@@ -5,6 +5,7 @@
 #include "FileBrowserPage.h"
 #include "PagesDisplayLoop.h"
 #include "BlockingInputProcessor.h"
+#include "TextEditorPage.h"
 
 #define COLOR_LIGHTBLUE 11
 
@@ -24,7 +25,9 @@ int main() {
     testPage1.setColours(COLOR_BLACK,COLOR_BLACK,COLOR_BLUE,COLOR_CYAN,COLOR_BLACK,COLOR_BLUE);
 //    Page::setUseGlobalColours(TRUE);
 
-    MenuPage menuPage1 = MenuPage("Menu1", {&testPage1}, UseBlockingInputProcessor());
+    TextEditorPage textEditorPage = TextEditorPage("Text Editor", "/tmp/CMDPages_ExampleFile.txt", UseBlockingInputProcessor());
+
+    MenuPage menuPage1 = MenuPage("Menu1", {&testPage1, &textEditorPage}, UseBlockingInputProcessor());
     MenuPage menuPage2 = MenuPage("Menu2", {}, UseBlockingInputProcessor());
     FileBrowserPage fileBrowserPage = FileBrowserPage("File Browser 1",".",".*", UseBlockingInputProcessor());
     fileBrowserPage.setFileBrowserColours(COLOR_LIGHTBLUE,COLOR_LIGHTBLUE,COLOR_RED,COLOR_RED);
