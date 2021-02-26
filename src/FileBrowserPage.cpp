@@ -3,7 +3,7 @@
 //
 
 #include "FileBrowserPage.h"
-#include "FileSystemReader.h"
+#include "FileSystemHandler.h"
 #include "BlockingInputProcessor.h"
 #include <unistd.h>
 
@@ -19,13 +19,15 @@
 #define BOX_EXECUTABLE_COLOUR_PAIR 6
 #define BOX_HIGHLIGHT_EXECUTABLE_COLOUR_PAIR 7
 
-FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, IInputProcessor& inputProcessor) : FileBrowserPage(std::move(name),path,".*",inputProcessor) {
+FileBrowserPage::FileBrowserPage(std::string name, const std::string &path, IInputProcessor &inputProcessor)
+        : FileBrowserPage(std::move(name), path, ".*", inputProcessor) {
 }
 
-FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, const std::string& filter, IInputProcessor& inputProcessor) : Page(std::move(name),calculateWindowDimensions(path,filter),inputProcessor) {
+FileBrowserPage::FileBrowserPage(std::string name, const std::string &path, const std::string &filter, IInputProcessor &inputProcessor)
+        : Page(std::move(name), calculateWindowDimensions(name,path,filter),inputProcessor) {
     selectedFileIndex = 0;
     directoryPath = std::filesystem::path(path);
-    discoveredFiles = FileSystemReader::getDirectoryContents(directoryPath, filter);
+    discoveredFiles = FileSystemHandler::getDirectoryContents(directoryPath, filter);
 
     init_color(COLOR_LIGHTBLUE,300,600,1000);
     colour_directory = COLOR_LIGHTBLUE;
@@ -34,10 +36,10 @@ FileBrowserPage::FileBrowserPage(std::string name, const std::string& path, cons
     colour_highlightExecutable = COLOR_GREEN;
 }
 
-std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string& path, const std::string& filter) {
-    std::vector<std::filesystem::directory_entry> files = FileSystemReader::getDirectoryContents(path, filter);
+std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string& name, const std::string& path, const std::string& filter) {
+    std::vector<std::filesystem::directory_entry> files = FileSystemHandler::getDirectoryContents(path, filter);
 
-    int highestLength = 0;
+    int highestLength = (int) name.length();
     int fileCount = 0;
     for (auto& file : files) {
         int entryLength = file.path().filename().string().length();

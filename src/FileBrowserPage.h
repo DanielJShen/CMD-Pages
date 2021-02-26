@@ -56,7 +56,7 @@ public:
     void setOnSelectFile(FileActionCallback* onSelectFile);
 
 private:
-    static std::array<int, 2> calculateWindowDimensions(const std::string& path, const std::string& filter);
+    static std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::string& path, const std::string& filter);
     std::filesystem::path directoryPath;
     std::vector<std::filesystem::directory_entry> discoveredFiles;
     int selectedFileIndex;

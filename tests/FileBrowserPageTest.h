@@ -11,6 +11,7 @@ protected:
         std::filesystem::remove("/tmp/tempCMD_Pages_TempDir/tempCMD_Pages_TempDir");
         std::filesystem::remove("/tmp/tempCMD_Pages_TempDir");
         std::filesystem::remove("/tmp/tempCMD_Pages_FileXXXXX");
+        std::filesystem::remove("/tmp/.tempCMD_Pages_FileXXXXX");
     }
 };
 

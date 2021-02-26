@@ -22,8 +22,8 @@ public:
     void destroy() override;
 
 private:
-    std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::vector<Page*>& pages);
-    int getLargestPageNameLength(const std::string& name, const std::vector<Page*>& entries);
+    static std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::vector<Page*>& pages);
+    static int getLargestPageNameLength(const std::string& name, const std::vector<Page*>& entries);
     Page* getPageWithName(const std::string& name);
     int getSelected();
     std::vector<Page*> availablePages;
