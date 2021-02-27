@@ -13,11 +13,18 @@ public:
     TextEditorPage(std::string name, const std::string &filePath, IInputProcessor &inputProcessor);
 
     void display() override;
+    void destroy() override;
 
 private:
     static std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::string &filePath);
+    void triggerEvent(const PageCallback &changePageCallback, KeyInput eventType) override;
 
     std::string filePath;
+    std::vector<std::string> fileContent;
+
+    /** This stores the x and y of the cursor respectivly, the y being the line number and the x being position on the line.
+     */
+    std::array<int,2> cursorPosition;
 };
 
 

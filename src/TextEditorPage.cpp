@@ -5,10 +5,13 @@
 #include "TextEditorPage.h"
 #include "FileSystemHandler.h"
 #include "Logger.h"
+#include "cursesapp.h"
 
 TextEditorPage::TextEditorPage(std::string name, const std::string &filePath, IInputProcessor &inputProcessor)
         : Page(std::move(name), calculateWindowDimensions(name,filePath), inputProcessor) {
     this->filePath = filePath;
+    fileContent = FileSystemHandler::getFileContentByLines(filePath); //TODO load on page open as well
+    cursorPosition = {0,0};
 }
 
 std::array<int, 2> TextEditorPage::calculateWindowDimensions(const std::string& name, const std::string &filePath) {
@@ -36,13 +39,52 @@ std::array<int, 2> TextEditorPage::calculateWindowDimensions(const std::string& 
 }
 
 void TextEditorPage::display() {
-    std::vector<std::string> fileContent = FileSystemHandler::getFileContentByLines(filePath);
     for (int lineIndex=0; lineIndex<fileContent.size(); lineIndex++) {
         mvwprintw(contentWindow,2+lineIndex, 2, "%s", fileContent[lineIndex].c_str());
     }
     //TODO Make text editable
 //    echo();
-//    curs_set(2);
-//    mvcur(contentWindow->_curx,contentWindow->_cury, contentWindow->_begx,contentWindow->_begy);
+    curs_set(2);
+    mvcur(contentWindow->_curx,contentWindow->_cury, contentWindow->_begx+3+cursorPosition[0],contentWindow->_begy+3+cursorPosition[1]);
     Page::display();
+}
+
+void TextEditorPage::destroy() {
+    curs_set(0);
+    Page::destroy();
+}
+
+void TextEditorPage::triggerEvent(const PageCallback &changePageCallback, KeyInput keyInput) {
+    if (keyInput.getObjectInputType() == KeyInput::inputType::functionKey) {
+        switch (keyInput.getFunctionKeyInput()) {
+            case KeyInput::UpKey:
+                display();
+                break;
+            case KeyInput::DownKey:
+                display();
+                break;
+            case KeyInput::LeftKey:
+                display();
+                break;
+            case KeyInput::RightKey:
+                display();
+                break;
+            case KeyInput::Resize:
+                updateSize();
+                display();
+                break;
+            case KeyInput::EscapeKey:
+                FileSystemHandler::setFileContent(filePath, fileContent);
+                curs_set(0);
+                changePageCallback(nullptr);
+                break;
+            case KeyInput::EnterKey:
+                //TODO newline
+                break;
+        }
+    } else if (keyInput.getObjectInputType() == KeyInput::inputType::character) {
+        //TODO set new content?
+        fileContent.at(cursorPosition[1]).insert(cursorPosition[0], 1, keyInput.getCharacterInput());
+        display();
+    }
 }

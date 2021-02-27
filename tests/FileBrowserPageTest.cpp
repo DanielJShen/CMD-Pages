@@ -6,7 +6,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../src/FileBrowserPage.h"
-#include "../src/BlockingInputProcessor.h"
+#include "../src/InputHandling/BlockingInputProcessor.h"
 #include "MockInputProcessor.h"
 #include "FileBrowserPageTest.h"
 
@@ -27,7 +27,7 @@ TEST_F (FileBrowserPageTest, DirectoryActionCallbackCalled) {
     MockInputProcessor& inputProcessor = UseMockInputProcessor();
     EXPECT_CALL(inputProcessor, readInput())
             .Times(AtLeast(1))
-            .WillOnce(Return(inputProcessor.EnterKey));
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::EnterKey) ));
 
     std::filesystem::create_directory("/tmp/tempCMD_Pages_TempDir");
 
@@ -48,7 +48,7 @@ TEST_F (FileBrowserPageTest, FileActionCallbackCalled) {
     MockInputProcessor& inputProcessor = UseMockInputProcessor();
     EXPECT_CALL(inputProcessor, readInput())
             .Times(AtLeast(1))
-            .WillOnce(Return(inputProcessor.EnterKey));
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::EnterKey) ));
 
     std::ofstream outStream("/tmp/.tempCMD_Pages_FileXXXXX");
     outStream << "Hello, World\n" << std::endl;
@@ -64,8 +64,8 @@ TEST_F (FileBrowserPageTest, SubdirectoriesDirectoryActionCalled) {
     MockInputProcessor& inputProcessor = UseMockInputProcessor();
     EXPECT_CALL(inputProcessor, readInput())
             .Times(AtLeast(2))
-            .WillOnce(Return(inputProcessor.EnterKey))
-            .WillOnce(Return(inputProcessor.EnterKey));
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::EnterKey) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::EnterKey) ));
 
     std::filesystem::create_directory("/tmp/tempCMD_Pages_TempDir");
     std::filesystem::create_directory("/tmp/tempCMD_Pages_TempDir/tempCMD_Pages_TempDir");

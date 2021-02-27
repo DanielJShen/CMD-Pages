@@ -66,3 +66,34 @@ TEST_F (FileSystemHandlerTest, DontCreateLinuxFile) {
     std::string fileOutput = FileSystemHandler::getFileContent("/tmp/.tempCMD_Pages_FileXXXXX");
     ASSERT_EQ( fileOutput, fileContent );
 }
+
+TEST_F (FileSystemHandlerTest, WriteLinuxFile) {
+    std::string fileContent = "Hello, World\nWriteLinuxFile Test\n";
+    std::string filePath = "/tmp/.tempCMD_Pages_FileXXXXX";
+
+    FileSystemHandler::createFileIfNotThere(filePath);
+    ASSERT_NO_THROW( FileSystemHandler::setFileContent(filePath, fileContent) );
+    std::string fileOutput = FileSystemHandler::getFileContent(filePath);
+    ASSERT_EQ( fileContent, fileOutput );
+}
+
+TEST_F (FileSystemHandlerTest, ReadLinuxFileLines) {
+    std::string fileContent = "Hello, World\nReadLinuxFileLines Test\n";
+    std::string filePath = "/tmp/.tempCMD_Pages_FileXXXXX";
+    std::ofstream outStream(filePath);
+    outStream << fileContent << std::flush;
+
+    std::vector<std::string> fileOutput = FileSystemHandler::getFileContentByLines(filePath);
+    std::vector<std::string> fileContentLines = {"Hello, World","ReadLinuxFileLines Test",""};
+    ASSERT_EQ( fileOutput, fileContentLines );
+}
+
+TEST_F (FileSystemHandlerTest, WriteLinuxFileLines) {
+    std::vector<std::string> fileContent = {"Hello, World","WriteLinuxFileLines Test",""};
+    std::string filePath = "/tmp/.tempCMD_Pages_FileXXXXX";
+
+    FileSystemHandler::createFileIfNotThere(filePath);
+    ASSERT_NO_THROW( FileSystemHandler::setFileContent(filePath, fileContent) );
+    std::vector<std::string> fileOutput = FileSystemHandler::getFileContentByLines(filePath);
+    ASSERT_EQ( fileContent, fileOutput );
+}

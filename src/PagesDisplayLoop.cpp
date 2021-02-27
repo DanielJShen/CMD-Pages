@@ -31,7 +31,7 @@ void PagesDisplayLoop::startPageLoop(Page* initialPage){
     cbreak();
     initialPage->display();
     try {
-        while (continuePageLoop) {
+        while (continuePageLoop) { //TODO Change to a multithreaded event based system
             currentPage->iterate([this](auto &&PH1) { changePage(PH1); });
         }
     } catch (std::runtime_error& error) {

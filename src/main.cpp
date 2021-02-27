@@ -4,7 +4,7 @@
 #include "Logger.h"
 #include "FileBrowserPage.h"
 #include "PagesDisplayLoop.h"
-#include "BlockingInputProcessor.h"
+#include "InputHandling/BlockingInputProcessor.h"
 #include "TextEditorPage.h"
 
 #define COLOR_LIGHTBLUE 11

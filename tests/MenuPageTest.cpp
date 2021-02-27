@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../src/MenuPage.h"
-#include "../src/BlockingInputProcessor.h"
+#include "../src/InputHandling/BlockingInputProcessor.h"
 #include "MockInputProcessor.h"
 #include "MockCallback.h"
 
@@ -32,7 +32,7 @@ TEST (MenuPageTest, TestCallback) {
     MenuPage initialPage = MenuPage("1st Menu", {}, inputProcessor);
     EXPECT_CALL(inputProcessor, readInput())
             .Times(AtLeast(1))
-            .WillOnce(Return(inputProcessor.EscapeKey));
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::EscapeKey) ));
     MockCallback mockCallback;
     EXPECT_CALL(mockCallback, changePage(nullptr))
             .Times(AtLeast(1));

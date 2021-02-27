@@ -12,7 +12,7 @@
 #include <curses.h>
 #include <array>
 #include <memory>
-#include "IInputProcessor.h"
+#include "InputHandling/IInputProcessor.h"
 using namespace std::placeholders;
 
 /** An empty NCurses window of variable size with a solid background, it can be extended to add functionality.
@@ -88,7 +88,7 @@ protected:
     * @param eventType The inputEvent being triggered
     * @param changePageCallback A callback for changing the currently displayed page
     */
-    virtual void triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType);
+    virtual void triggerEvent(const PageCallback &changePageCallback, KeyInput keyEvent);
 
 };
 
