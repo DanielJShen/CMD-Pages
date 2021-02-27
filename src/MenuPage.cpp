@@ -72,41 +72,43 @@ void MenuPage::destroy() {
     Page::destroy();
 }
 
-void MenuPage::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
-    switch (eventType) {
-        case IInputProcessor::UpKey:
-            if (!availablePages.empty()) {
-                int newSelectedEntry = selectedEntry - 1;
-                if(newSelectedEntry < 0){
-                    newSelectedEntry = (int)availablePages.size() - 1;
+void MenuPage::triggerEvent(const PageCallback &changePageCallback, KeyInput keyInput) {
+    if (keyInput.getObjectInputType() == KeyInput::inputType::functionKey) {
+        switch (keyInput.getFunctionKeyInput()) {
+            case KeyInput::UpKey:
+                if (!availablePages.empty()) {
+                    int newSelectedEntry = selectedEntry - 1;
+                    if (newSelectedEntry < 0) {
+                        newSelectedEntry = (int) availablePages.size() - 1;
+                    }
+                    selectedEntry = newSelectedEntry;
                 }
-                selectedEntry = newSelectedEntry;
-            }
-            display();
-            break;
-        case IInputProcessor::DownKey:
-            if (!availablePages.empty()) {
-                int newSelectedEntry = selectedEntry + 1;
-                if(newSelectedEntry >= availablePages.size()){
-                    newSelectedEntry = 0;
+                display();
+                break;
+            case KeyInput::DownKey:
+                if (!availablePages.empty()) {
+                    int newSelectedEntry = selectedEntry + 1;
+                    if (newSelectedEntry >= availablePages.size()) {
+                        newSelectedEntry = 0;
+                    }
+                    selectedEntry = newSelectedEntry;
                 }
-                selectedEntry = newSelectedEntry;
-            }
-            display();
-            break;
-        case IInputProcessor::Resize:
-            updateSize();
-            display();
-            break;
-        case IInputProcessor::EscapeKey:
-            changePageCallback(nullptr);
-            break;
-        case IInputProcessor::EnterKey:
-            Page* destinationPage = getPagePointerForSelectedMenuEntry();
-            if (destinationPage != nullptr) {
-                changePageCallback(destinationPage);
-            }
-            break;
+                display();
+                break;
+            case KeyInput::Resize:
+                updateSize();
+                display();
+                break;
+            case KeyInput::EscapeKey:
+                changePageCallback(nullptr);
+                break;
+            case KeyInput::EnterKey:
+                Page *destinationPage = getPagePointerForSelectedMenuEntry();
+                if (destinationPage != nullptr) {
+                    changePageCallback(destinationPage);
+                }
+                break;
+        }
     }
 }
 

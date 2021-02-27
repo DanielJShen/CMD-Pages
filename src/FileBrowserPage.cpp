@@ -4,7 +4,7 @@
 
 #include "FileBrowserPage.h"
 #include "FileSystemHandler.h"
-#include "BlockingInputProcessor.h"
+#include "InputHandling/BlockingInputProcessor.h"
 #include <unistd.h>
 
 #include <utility>
@@ -98,62 +98,65 @@ void FileBrowserPage::destroy() {
     Page::destroy();
 }
 
-void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
-    switch (eventType) {
-        case IInputProcessor::UpKey:
-            if (!discoveredFiles.empty()) {
-                int newSelectedEntry = selectedFileIndex - 1;
-                if(newSelectedEntry < 0){
-                    newSelectedEntry = (int)discoveredFiles.size() - 1;
-                }
-                selectedFileIndex = newSelectedEntry;
-            }
-            display();
-            break;
-        case IInputProcessor::DownKey:
-            if (!discoveredFiles.empty()) {
-                int newSelectedEntry = selectedFileIndex + 1;
-                if(newSelectedEntry >= discoveredFiles.size()){
-                    newSelectedEntry = 0;
-                }
-                selectedFileIndex = newSelectedEntry;
-            }
-            display();
-            break;
-        case IInputProcessor::EscapeKey:
-            changePageCallback(nullptr);
-            break;
-        case IInputProcessor::Resize:
-            updateSize();
-            display();
-            break;
-        case IInputProcessor::EnterKey:
-            if (!discoveredFiles.empty()) {
-                std::filesystem::directory_entry &selectedFile = discoveredFiles.at(selectedFileIndex);
-                if (selectedFile.is_directory()) {
-                    if (onSelectDirectory == nullptr) {
-                        Logger::appendMessage(
-                                "'onSelectDirectory' is not set! No action performed for selecting a directory. FileBrowserPage:" +
-                                getName());
-                    } else {
-                        (*onSelectDirectory)(selectedFile, this);
+void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, KeyInput keyInput) {
+    if (keyInput.getObjectInputType() == KeyInput::inputType::functionKey) {
+        switch (keyInput.getFunctionKeyInput()) {
+            case KeyInput::UpKey:
+                if (!discoveredFiles.empty()) {
+                    int newSelectedEntry = selectedFileIndex - 1;
+                    if (newSelectedEntry < 0) {
+                        newSelectedEntry = (int) discoveredFiles.size() - 1;
                     }
-                } else if (selectedFile.is_regular_file()) {
-                    if (onSelectFile == nullptr) {
-                        Logger::appendMessage(
-                                "'onSelectFile' is not set! No action performed for selecting a directory. FileBrowserPage:" +
-                                getName());
+                    selectedFileIndex = newSelectedEntry;
+                }
+                display();
+                break;
+            case KeyInput::DownKey:
+                if (!discoveredFiles.empty()) {
+                    int newSelectedEntry = selectedFileIndex + 1;
+                    if (newSelectedEntry >= discoveredFiles.size()) {
+                        newSelectedEntry = 0;
+                    }
+                    selectedFileIndex = newSelectedEntry;
+                }
+                display();
+                break;
+            case KeyInput::EscapeKey:
+                changePageCallback(nullptr);
+                break;
+            case KeyInput::Resize:
+                updateSize();
+                display();
+                break;
+            case KeyInput::EnterKey:
+                if (!discoveredFiles.empty()) {
+                    std::filesystem::directory_entry &selectedFile = discoveredFiles.at(selectedFileIndex);
+                    if (selectedFile.is_directory()) {
+                        if (onSelectDirectory == nullptr) {
+                            Logger::appendMessage(
+                                    "'onSelectDirectory' is not set! No action performed for selecting a directory. FileBrowserPage:" +
+                                    getName());
+                        } else {
+                            (*onSelectDirectory)(selectedFile, this);
+                        }
+                    } else if (selectedFile.is_regular_file()) {
+                        if (onSelectFile == nullptr) {
+                            Logger::appendMessage(
+                                    "'onSelectFile' is not set! No action performed for selecting a directory. FileBrowserPage:" +
+                                    getName());
+                        } else {
+                            (*onSelectFile)(selectedFile, this);
+                        }
                     } else {
+                        Logger::appendMessage(
+                                "Non-regular file, unable to process correct action. Path:" +
+                                selectedFile.path().string());
                         (*onSelectFile)(selectedFile, this);
                     }
-                } else {
-                    Logger::appendMessage(
-                            "Non-regular file, unable to process correct action. Path:" + selectedFile.path().string());
-                    (*onSelectFile)(selectedFile, this);
                 }
-            }
-            break;
-    };
+                break;
+        };
+    }
 }
 
 void FileBrowserPage::setFileBrowserColours(short directory, short highlightDirectory, short executable, short highlightExecutable){

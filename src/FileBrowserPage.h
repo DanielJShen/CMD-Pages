@@ -66,7 +66,7 @@ private:
     NCURSES_COLOR_T colour_executable;
     NCURSES_COLOR_T colour_highlightExecutable;
 
-    void triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) override;
+    void triggerEvent(const PageCallback &changePageCallback, KeyInput eventType) override;
 };
 
 

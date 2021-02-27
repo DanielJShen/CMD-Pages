@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../src/Page.h"
-#include "../src/BlockingInputProcessor.h"
+#include "../src/InputHandling/BlockingInputProcessor.h"
 
 using ::testing::AtLeast;
 using ::testing::Return;

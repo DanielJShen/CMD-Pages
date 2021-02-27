@@ -66,3 +66,21 @@ void FileSystemHandler::createFileIfNotThere(const std::string &filePath) {
         ofs.close();
     }
 }
+
+void FileSystemHandler::setFileContent(const std::string& filePath, std::string fileContent) {
+    std::ofstream fileOutputStream(filePath);
+    const auto fileSize = fileContent.size();
+    fileOutputStream.write(fileContent.data(), fileSize);
+}
+
+void FileSystemHandler::setFileContent(const std::string& filePath, std::vector<std::string> fileContent) {
+    std::string fileContentString;
+    std::string lastLine = fileContent.back();
+    fileContent.pop_back();
+    for (const std::string& line : fileContent) {
+        fileContentString += line+"\n";
+    }
+    fileContentString += lastLine;
+
+    FileSystemHandler::setFileContent(filePath, fileContentString);
+}

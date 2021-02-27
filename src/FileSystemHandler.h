@@ -17,6 +17,9 @@ public:
     static std::string getFileContent(const std::string &filePath);
     static std::vector<std::string> getFileContentByLines(const std::string &filePath);
     static void createFileIfNotThere(const std::string &filePath);
+
+    static void setFileContent(const std::string& filePath, std::string fileContent);
+    static void setFileContent(const std::string &filePath, std::vector<std::string> fileContent);
 };
 
 

@@ -5,7 +5,7 @@
 #include "Page.h"
 #include "Logger.h"
 #include "UUIDGenerator.h"
-#include "BlockingInputProcessor.h"
+#include "InputHandling/BlockingInputProcessor.h"
 
 #include <utility>
 
@@ -69,10 +69,8 @@ void Page::createWindows(int width, int height) {
  * @param changePageCallback A callback for changing the page to be iterated over.
  */
 void Page::iterate(const PageCallback &changePageCallback) {
-    IInputProcessor::inputEvent eventToBeTriggered = m_inputProcessor.readInput();
-    if (eventToBeTriggered != IInputProcessor::NoAction) {
-        triggerEvent(changePageCallback, eventToBeTriggered);
-    }
+    KeyInput keyInput = m_inputProcessor.readInput();
+    triggerEvent(changePageCallback, keyInput);
 }
 
 Page* Page::getPreviousPage() {
@@ -83,8 +81,8 @@ void Page::setPreviousPage(Page* prevPage) {
     previousPage = prevPage;
 }
 
-void Page::triggerEvent(const PageCallback &changePageCallback, IInputProcessor::inputEvent eventType) {
-    if (eventType == IInputProcessor::EscapeKey) {
+void Page::triggerEvent(const PageCallback &changePageCallback, KeyInput keyEvent) {
+    if (keyEvent.getObjectInputType() == KeyInput::inputType::functionKey && keyEvent.getFunctionKeyInput() == KeyInput::EscapeKey) {
             changePageCallback(nullptr);
     }
 }

@@ -15,9 +15,9 @@ class BlockingInputProcessor : public IInputProcessor {
 public:
     /** This method uses wgetch to read key inputs, its a blocking method wand will wait until there is an input.
      *
-     * @return IInputProcessor::inputEvent An event representing the key pressed.
+     * @return KeyInput::inputEvent An event representing the key pressed.
      */
-    IInputProcessor::inputEvent readInput() override;
+    KeyInput readInput() override;
 
 };
 

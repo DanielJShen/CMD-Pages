@@ -5,7 +5,7 @@
 #include <curses.h>
 #include "BlockingInputProcessor.h"
 
-IInputProcessor::inputEvent BlockingInputProcessor::readInput() {
+KeyInput BlockingInputProcessor::readInput() {
     notimeout(stdscr, TRUE);
     int input = wgetch(stdscr);
     if (input == 27) { // 27 is the escape code
@@ -14,23 +14,23 @@ IInputProcessor::inputEvent BlockingInputProcessor::readInput() {
         input = wgetch(stdscr);
         nodelay(stdscr, FALSE);
         if (input == ERR) {
-            return IInputProcessor::EscapeKey;
+            return KeyInput(KeyInput::inputEvent::EscapeKey);
         }
     }
     if (input == 'A') {
-        return IInputProcessor::UpKey;
+        return KeyInput(KeyInput::inputEvent::UpKey);
     } else if (input == 'B' ) {
-        return IInputProcessor::DownKey;
+        return KeyInput(KeyInput::inputEvent::DownKey);
     } else if (input == 'C') {
-        return IInputProcessor::RightKey;
+        return KeyInput(KeyInput::inputEvent::RightKey);
     } else if (input == 'D') {
-        return IInputProcessor::LeftKey;
+        return KeyInput(KeyInput::inputEvent::LeftKey);
     } else if (input == 10) {
-        return IInputProcessor::EnterKey;
+        return KeyInput(KeyInput::inputEvent::EnterKey);
     } else if (input == KEY_RESIZE) {
-        return IInputProcessor::Resize;
+        return KeyInput(KeyInput::inputEvent::Resize);
     } else {
-        return IInputProcessor::NoAction;
+        return KeyInput(KeyInput::inputEvent::NoAction);
     }
 }
 

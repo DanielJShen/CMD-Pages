@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../src/Page.h"
-#include "../src/BlockingInputProcessor.h"
+#include "../src/InputHandling/BlockingInputProcessor.h"
 #include "MockInputProcessor.h"
 #include "MockCallback.h"
 
@@ -32,7 +32,7 @@ TEST (PageTest, TestCallback) {
     Page initialPage = Page("Page", {40,10}, inputProcessor);
     EXPECT_CALL(inputProcessor, readInput())
             .Times(AtLeast(1))
-            .WillOnce(Return(inputProcessor.EscapeKey));
+            .WillOnce(Return(KeyInput(KeyInput::inputEvent::EscapeKey)));
 
     MockCallback mockCallback;
     EXPECT_CALL(mockCallback, changePage(nullptr))
@@ -47,13 +47,13 @@ TEST (PageTest, TestNoCallback) {
     Page initialPage = Page("Page", {40,10}, inputProcessor);
     EXPECT_CALL(inputProcessor, readInput())
             .Times(AtLeast(7))
-            .WillOnce(Return(inputProcessor.RightKey))
-            .WillOnce(Return(inputProcessor.LeftKey))
-            .WillOnce(Return(inputProcessor.UpKey))
-            .WillOnce(Return(inputProcessor.DownKey))
-            .WillOnce(Return(inputProcessor.EnterKey))
-            .WillOnce(Return(inputProcessor.Resize))
-            .WillOnce(Return(inputProcessor.NoAction));
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::RightKey) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::LeftKey) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::UpKey) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::DownKey) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::EnterKey) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::Resize) ))
+            .WillOnce(Return( KeyInput(KeyInput::inputEvent::NoAction) ));
     for (int i=0; i<7; i++) {
         initialPage.iterate([this](auto &&PH1) { ASSERT_TRUE(FALSE); });
     }

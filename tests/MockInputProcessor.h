@@ -6,11 +6,11 @@
 #define CMDPAGES_MOCKINPUTPROCESSOR_H
 
 #include "gmock/gmock.h"
-#include "../src/IInputProcessor.h"
+#include "../src/InputHandling/IInputProcessor.h"
 
 class MockInputProcessor : public IInputProcessor {
 public:
-    MOCK_METHOD0(readInput, IInputProcessor::inputEvent());
+    MOCK_METHOD0(readInput, KeyInput());
 };
 
 static MockInputProcessor& UseMockInputProcessor() {
