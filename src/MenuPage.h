@@ -17,9 +17,9 @@ class MenuPage : public Page {
 public:
     MenuPage(std::string name, std::vector<Page*> pages, IInputProcessor& inputProcessor);
 
-    void display() override;
+    void displayContent() override;
+    void updateSize(int windowWidth, int windowHeight) override;
     void updateSize() override;
-    void destroy() override;
 
 private:
     static std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::vector<Page*>& pages);

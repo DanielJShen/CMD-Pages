@@ -16,19 +16,31 @@ KeyInput BlockingInputProcessor::readInput() {
         if (input == ERR) {
             return KeyInput(KeyInput::inputEvent::EscapeKey);
         }
+        Logger::appendMessage("Function Key Input:"+std::to_string(input));
+
+        if (input == 'A') {
+            return KeyInput(KeyInput::inputEvent::UpKey);
+        } else if (input == 'B' ) {
+            return KeyInput(KeyInput::inputEvent::DownKey);
+        } else if (input == 'C') {
+            return KeyInput(KeyInput::inputEvent::RightKey);
+        } else if (input == 'D') {
+            return KeyInput(KeyInput::inputEvent::LeftKey);
+        } else if (input == 53) {
+            return KeyInput(KeyInput::inputEvent::PageUp);
+        } else if (input == 54) {
+            return KeyInput(KeyInput::inputEvent::PageDown);
+        } else if (input == 72) {
+            return KeyInput(KeyInput::inputEvent::HomeKey);
+        } else if (input == 70) {
+            return KeyInput(KeyInput::inputEvent::EndKey);
+        }
     }
-    if (input == 'A') {
-        return KeyInput(KeyInput::inputEvent::UpKey);
-    } else if (input == 'B' ) {
-        return KeyInput(KeyInput::inputEvent::DownKey);
-    } else if (input == 'C') {
-        return KeyInput(KeyInput::inputEvent::RightKey);
-    } else if (input == 'D') {
-        return KeyInput(KeyInput::inputEvent::LeftKey);
+    Logger::appendMessage("Key Input:"+std::to_string(input));
+    if (input == KEY_RESIZE) {
+        return KeyInput(KeyInput::inputEvent::Resize);
     } else if (input == 10) {
         return KeyInput(KeyInput::inputEvent::EnterKey);
-    } else if (input == KEY_RESIZE) {
-        return KeyInput(KeyInput::inputEvent::Resize);
     } else {
         return KeyInput(KeyInput::inputEvent::NoAction);
     }

@@ -45,9 +45,9 @@ public:
      */
     void setFileBrowserColours(NCURSES_COLOR_T directory, NCURSES_COLOR_T highlightDirectory, NCURSES_COLOR_T executable, NCURSES_COLOR_T highlightExecutable);
 
-    void display() override;
+    void displayContent() override;
+    void updateSize(int windowWidth, int windowHeight) override;
     void updateSize() override;
-    void destroy() override;
 
     typedef std::function<void(const std::filesystem::directory_entry&, FileBrowserPage*)> FileActionCallback;
     FileActionCallback* onSelectDirectory = nullptr;
@@ -67,6 +67,7 @@ private:
     NCURSES_COLOR_T colour_highlightExecutable;
 
     void triggerEvent(const PageCallback &changePageCallback, KeyInput eventType) override;
+
 };
 
 

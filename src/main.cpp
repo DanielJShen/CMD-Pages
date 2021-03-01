@@ -3,9 +3,10 @@
 #include "MenuPage.h"
 #include "Logger.h"
 #include "FileBrowserPage.h"
-#include "PagesDisplayLoop.h"
+#include "PagesController.h"
 #include "InputHandling/BlockingInputProcessor.h"
 #include "TextEditorPage.h"
+#include "TextViewPage.h"
 
 #define COLOR_LIGHTBLUE 11
 
@@ -18,7 +19,7 @@
 int main() {
     Logger::initLogger("CMDPages.log");
 
-    PagesDisplayLoop pagesCore = PagesDisplayLoop();
+    PagesController pagesCore = PagesController();
 
 
     Page testPage1 = Page("Test1",{40,10}, UseBlockingInputProcessor());
@@ -41,6 +42,14 @@ int main() {
         pagesCore.changePage(fileBrowserPagePointers.back().get());
     };
     fileBrowserPage.setOnSelectDirectory(&onDirectorySelect);
+    std::shared_ptr<TextViewPage> textViewPagePtr;
+    FileActionCallback  onFileSelect = [&pagesCore,&textViewPagePtr]( const std::filesystem::directory_entry& file, FileBrowserPage* callingObject ) {
+        std::string command = "cat "+file.path().string();
+        std::string cmdOutput = pagesCore.executeLinuxCommand(command);
+        textViewPagePtr = std::make_unique<TextViewPage>(file.path().filename().string(),cmdOutput,UseBlockingInputProcessor());
+        pagesCore.changePage(textViewPagePtr.get());
+    };
+    fileBrowserPage.setOnSelectFile(&onFileSelect);
 
     MenuPage initialPage = MenuPage("Main Menu", {&menuPage1,&menuPage2,&fileBrowserPage}, UseBlockingInputProcessor());
     pagesCore.startPageLoop(&initialPage);
