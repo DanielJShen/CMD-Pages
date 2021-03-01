@@ -57,7 +57,7 @@ std::array<int, 2> FileBrowserPage::calculateWindowDimensions(const std::string&
     return {width,height};
 }
 
-void FileBrowserPage::display() {
+void FileBrowserPage::displayContent() {
     if (!useGlobalColours) {
         init_pair(4,colour_directory,colour_box2);      //BOX_DIRECTORY_COLOUR_PAIR
         init_pair(5,colour_highlightDirectory,colour_boxHighlighted2);  //BOX_HIGHLIGHT_DIRECTORY_COLOUR_PAIR
@@ -87,15 +87,15 @@ void FileBrowserPage::display() {
         mvwprintw(contentWindow,i+3, 5, "- %s", filename.c_str());
         wattroff(contentWindow,COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
     }
-    Page::display();
+    Page::displayContent();
+}
+
+void FileBrowserPage::updateSize(int windowWidth, int windowHeight) {
+    Page::updateSize(windowWidth, windowHeight);
 }
 
 void FileBrowserPage::updateSize() {
     Page::updateSize();
-}
-
-void FileBrowserPage::destroy() {
-    Page::destroy();
 }
 
 void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, KeyInput keyInput) {
@@ -109,7 +109,7 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, KeyIn
                     }
                     selectedFileIndex = newSelectedEntry;
                 }
-                display();
+                displayContent();
                 break;
             case KeyInput::DownKey:
                 if (!discoveredFiles.empty()) {
@@ -119,14 +119,14 @@ void FileBrowserPage::triggerEvent(const PageCallback &changePageCallback, KeyIn
                     }
                     selectedFileIndex = newSelectedEntry;
                 }
-                display();
+                displayContent();
                 break;
             case KeyInput::EscapeKey:
                 changePageCallback(nullptr);
                 break;
             case KeyInput::Resize:
                 updateSize();
-                display();
+                displayContent();
                 break;
             case KeyInput::EnterKey:
                 if (!discoveredFiles.empty()) {

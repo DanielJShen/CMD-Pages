@@ -12,8 +12,7 @@ class TextEditorPage : public Page {
 public:
     TextEditorPage(std::string name, const std::string &filePath, IInputProcessor &inputProcessor);
 
-    void display() override;
-    void destroy() override;
+    void displayContent() override;
 
 private:
     static std::array<int, 2> calculateWindowDimensions(const std::string& name, const std::string &filePath);

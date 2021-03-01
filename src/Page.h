@@ -28,8 +28,16 @@ public:
     virtual void iterate(const PageCallback &changePageCallback);
 
     virtual void display();
+    virtual void displayContent();
+    /** Changes the contentWindow size and updates the size of the backgroundWindow.
+     *
+     * @param width The width of the contentWindow
+     * @param height The height of the contentWindow
+     */
+    virtual void updateSize(int width, int height);
+    /** Updates the size of the contentWindow and backgroundWindow.
+     */
     virtual void updateSize();
-    virtual void destroy();
 
 
     std::string getName();
@@ -74,7 +82,11 @@ protected:
 
     static bool useGlobalColours;
 
-    std::array<int,4> calculateCoordinates();
+    /** Calculates the start position of the contentWindow. This is for centering the contentWindow.
+     *
+     * @return The y and x coordinates for the start position of the window.
+     */
+    std::array<int, 2> calculateCoordinates() const;
     void createWindows(int width, int height);
 
     Page* previousPage{};
@@ -89,7 +101,6 @@ protected:
     * @param changePageCallback A callback for changing the currently displayed page
     */
     virtual void triggerEvent(const PageCallback &changePageCallback, KeyInput keyEvent);
-
 };
 
 #endif //CMDPAGES_PAGE_H

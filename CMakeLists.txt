@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
-set(SOURCES src/Page.h src/Page.cpp src/FileBrowserPage.h src/FileBrowserPage.cpp src/MenuPage.h src/MenuPage.cpp src/Logger.h src/Logger.cpp src/PagesDisplayLoop.h src/PagesDisplayLoop.cpp src/UUIDGenerator.cpp src/UUIDGenerator.h src/FileSystemHandler.cpp src/FileSystemHandler.h src/InputHandling/IInputProcessor.h src/InputHandling/BlockingInputProcessor.cpp src/InputHandling/BlockingInputProcessor.h src/TextEditorPage.cpp src/TextEditorPage.h src/InputHandling/TextboxInputProcessor.cpp src/InputHandling/TextboxInputProcessor.h src/InputHandling/KeyInput.cpp src/InputHandling/KeyInput.h)
+set(SOURCES src/Page.h src/Page.cpp src/FileBrowserPage.h src/FileBrowserPage.cpp src/MenuPage.h src/MenuPage.cpp src/Logger.h src/Logger.cpp src/PagesController.h src/PagesController.cpp src/UUIDGenerator.cpp src/UUIDGenerator.h src/FileSystemHandler.cpp src/FileSystemHandler.h src/InputHandling/IInputProcessor.h src/InputHandling/BlockingInputProcessor.cpp src/InputHandling/BlockingInputProcessor.h src/TextEditorPage.cpp src/TextEditorPage.h src/InputHandling/TextboxInputProcessor.cpp src/InputHandling/TextboxInputProcessor.h src/InputHandling/KeyInput.cpp src/InputHandling/KeyInput.h src/TextViewPage.cpp src/TextViewPage.h)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 add_executable(${PROJECT_NAME}_example src/main.cpp)

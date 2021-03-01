@@ -38,19 +38,19 @@ int MenuPage::getLargestPageNameLength(const std::string& name, const std::vecto
     return highestLength;
 }
 
-void MenuPage::display() {
+void MenuPage::displayContent() {
     for (int i = 0; i < availablePages.size(); i++) {
-        std::string value = availablePages[i]->getName();
+        std::string pageEntryName = availablePages[i]->getName();
 
         double widthAvailable = windowWidth - 1;
         int textPosition;
         std::string offset;
-        if( value.size()%2 == 0 ) {
-            double textLength = (double)value.size() + 5;
+        if(pageEntryName.size() % 2 == 0 ) {
+            double textLength = (double)pageEntryName.size() + 5;
             textPosition = static_cast<int>( ceil((widthAvailable - textLength)/2) + 1 );
             offset = "  ";
         } else {
-            double textLength = (double)value.size() + 4;
+            double textLength = (double)pageEntryName.size() + 4;
             textPosition = static_cast<int>( ceil((widthAvailable - textLength)/2) + 1 );
             offset = " ";
         }
@@ -58,18 +58,18 @@ void MenuPage::display() {
         if(selectedEntry == i){
             wattron(contentWindow, COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
         }
-        mvwprintw(contentWindow, i + 2, textPosition, "[ %s%s]", value.c_str(), offset.c_str());
+        mvwprintw(contentWindow, i + 2, textPosition, "[ %s%s]", pageEntryName.c_str(), offset.c_str());
         wattroff(contentWindow, COLOR_PAIR(BOX_HIGHLIGHT_COLOUR_PAIR));
     }
-    Page::display();
+    Page::displayContent();
+}
+
+void MenuPage::updateSize(int windowWidth, int windowHeight) {
+    Page::updateSize(windowWidth, windowHeight);
 }
 
 void MenuPage::updateSize() {
     Page::updateSize();
-}
-
-void MenuPage::destroy() {
-    Page::destroy();
 }
 
 void MenuPage::triggerEvent(const PageCallback &changePageCallback, KeyInput keyInput) {
@@ -83,7 +83,7 @@ void MenuPage::triggerEvent(const PageCallback &changePageCallback, KeyInput key
                     }
                     selectedEntry = newSelectedEntry;
                 }
-                display();
+                displayContent();
                 break;
             case KeyInput::DownKey:
                 if (!availablePages.empty()) {
@@ -93,11 +93,11 @@ void MenuPage::triggerEvent(const PageCallback &changePageCallback, KeyInput key
                     }
                     selectedEntry = newSelectedEntry;
                 }
-                display();
+                displayContent();
                 break;
             case KeyInput::Resize:
                 updateSize();
-                display();
+                displayContent();
                 break;
             case KeyInput::EscapeKey:
                 changePageCallback(nullptr);

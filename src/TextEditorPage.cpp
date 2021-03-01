@@ -38,7 +38,7 @@ std::array<int, 2> TextEditorPage::calculateWindowDimensions(const std::string& 
     return {windowWidth,windowHeight};
 }
 
-void TextEditorPage::display() {
+void TextEditorPage::displayContent() {
     for (int lineIndex=0; lineIndex<fileContent.size(); lineIndex++) {
         mvwprintw(contentWindow,2+lineIndex, 2, "%s", fileContent[lineIndex].c_str());
     }
@@ -46,32 +46,27 @@ void TextEditorPage::display() {
 //    echo();
     curs_set(2);
     mvcur(contentWindow->_curx,contentWindow->_cury, contentWindow->_begx+3+cursorPosition[0],contentWindow->_begy+3+cursorPosition[1]);
-    Page::display();
-}
-
-void TextEditorPage::destroy() {
-    curs_set(0);
-    Page::destroy();
+    Page::displayContent();
 }
 
 void TextEditorPage::triggerEvent(const PageCallback &changePageCallback, KeyInput keyInput) {
     if (keyInput.getObjectInputType() == KeyInput::inputType::functionKey) {
         switch (keyInput.getFunctionKeyInput()) {
             case KeyInput::UpKey:
-                display();
+                displayContent();
                 break;
             case KeyInput::DownKey:
-                display();
+                displayContent();
                 break;
             case KeyInput::LeftKey:
-                display();
+                displayContent();
                 break;
             case KeyInput::RightKey:
-                display();
+                displayContent();
                 break;
             case KeyInput::Resize:
                 updateSize();
-                display();
+                displayContent();
                 break;
             case KeyInput::EscapeKey:
                 FileSystemHandler::setFileContent(filePath, fileContent);
@@ -85,6 +80,6 @@ void TextEditorPage::triggerEvent(const PageCallback &changePageCallback, KeyInp
     } else if (keyInput.getObjectInputType() == KeyInput::inputType::character) {
         //TODO set new content?
         fileContent.at(cursorPosition[1]).insert(cursorPosition[0], 1, keyInput.getCharacterInput());
-        display();
+        displayContent();
     }
 }

@@ -12,22 +12,26 @@ class KeyInput {
 public:
 
     enum inputType {
-        functionKey = 0,
-        string = 1,
-        character = 2
+        functionKey,
+        string,
+        character
     };
 
     /** Input events which are not a character or string. This means primarily function keys.
      */
     enum inputEvent {
-        NoAction = 0,
-        EnterKey = 1,
-        EscapeKey = 2,
-        UpKey = 3,
-        DownKey = 4,
-        LeftKey = 5,
-        RightKey = 6,
-        Resize = 7
+        NoAction,
+        EnterKey,
+        EscapeKey,
+        UpKey,
+        DownKey,
+        LeftKey,
+        RightKey,
+        PageUp,
+        PageDown,
+        HomeKey,
+        EndKey,
+        Resize
     };
 
     KeyInput();

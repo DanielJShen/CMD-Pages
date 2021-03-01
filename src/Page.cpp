@@ -58,8 +58,8 @@ void Page::createWindows(int width, int height) {
     backgroundWindow = newwin(LINES, COLS, 0, 0);
     wbkgd(backgroundWindow, COLOR_PAIR(BKG_COLOUR_PAIR));
 
-    auto [winHeight, winWidth, startY, startX] = calculateCoordinates();
-    contentWindow = newwin(winHeight, winWidth, startY, startX);
+    auto [startY, startX] = calculateCoordinates();
+    contentWindow = newwin(height, width, startY, startX);
     box(contentWindow, 0 , 0);
     wbkgd(contentWindow, COLOR_PAIR(BOX_COLOUR_PAIR));
 }
@@ -82,9 +82,14 @@ void Page::setPreviousPage(Page* prevPage) {
 }
 
 void Page::triggerEvent(const PageCallback &changePageCallback, KeyInput keyEvent) {
-    if (keyEvent.getObjectInputType() == KeyInput::inputType::functionKey && keyEvent.getFunctionKeyInput() == KeyInput::EscapeKey) {
+    if (keyEvent.getObjectInputType() == KeyInput::inputType::functionKey) {
+        if (keyEvent.getFunctionKeyInput() == KeyInput::EscapeKey) {
             changePageCallback(nullptr);
-    }
+        } else if (keyEvent.getFunctionKeyInput() == KeyInput::Resize) {
+            updateSize();
+            displayContent();
+        }
+     }
 }
 
 void Page::display() {
@@ -94,32 +99,34 @@ void Page::display() {
         init_pair(1,colour_boxHighlighted1,colour_boxHighlighted2);     //BOX_HIGHLIGHT_COLOUR_PAIR
     }
 
-    mvwprintw(contentWindow, 0, 2, "%s", pageName.c_str());
     redrawwin(backgroundWindow);
-    redrawwin(contentWindow);
     wrefresh(backgroundWindow);
+    displayContent();
+}
+
+void Page::displayContent() {
+    mvwprintw(contentWindow, 0, 2, "%s", pageName.c_str());
+    redrawwin(contentWindow);
     wrefresh(contentWindow);
 }
 
-void Page::updateSize() {
-    mvwin(backgroundWindow, 0, 0);
+void Page::updateSize(int width, int height) {
     wresize(backgroundWindow, LINES, COLS);
 
-    auto [height, width, startY, startX] = calculateCoordinates();
+    auto [startY, startX] = calculateCoordinates();
     mvwin(contentWindow, startY, startX);
-    wresize(contentWindow, windowHeight, windowWidth);
-
+    wresize(contentWindow, height, width);
+    display();
 }
 
-void Page::destroy() {
-    delwin(backgroundWindow);
-    delwin(contentWindow);
+void Page::updateSize() {
+    updateSize(windowWidth,windowHeight);
 }
 
-std::array<int, 4> Page::calculateCoordinates() {
+std::array<int, 2> Page::calculateCoordinates() const {
     int startY = (LINES - windowHeight) / 2;
     int startX = (COLS - windowWidth) / 2;
-    return {windowHeight, windowWidth, startY, startX};
+    return {startY, startX};
 }
 
 void Page::setColours(short background1, short background2, short box1, short box2, short boxHighlighted1,

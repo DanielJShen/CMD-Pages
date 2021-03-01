@@ -6,6 +6,7 @@
 #define CMDPAGES_IINPUTPROCESSOR_H
 
 #include "KeyInput.h"
+#include "../Logger.h"
 
 /** This class is an interface for classes which are used to read characters input from the keyboard and return the relevant event.
  * This interface is for the purpose of Dependency Injection. Reference: https://vladris.com/blog/2016/07/06/dependency-injection-in-c.html
