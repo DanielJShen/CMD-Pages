@@ -5,15 +5,11 @@
 #ifndef CMDPAGES_KEYINPUT_H
 #define CMDPAGES_KEYINPUT_H
 
-
-#include <string>
-
 class KeyInput {
 public:
 
     enum inputType {
         functionKey,
-        string,
         character
     };
 
@@ -36,20 +32,17 @@ public:
 
     KeyInput();
     explicit KeyInput(char characterInput);
-    explicit KeyInput(std::string stringInput);
     explicit KeyInput(inputEvent functionKeyInput);
 
     KeyInput::inputType getObjectInputType();
 
     char getCharacterInput();
-    std::string getStringInput();
     inputEvent getFunctionKeyInput();
 
 private:
     inputType objectInputType;
 
     char characterInput;
-    std::string stringInput;
     inputEvent functionKeyInput;
 
 };

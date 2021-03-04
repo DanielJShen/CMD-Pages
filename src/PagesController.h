@@ -35,14 +35,14 @@ public:
      *
      * @param command A string containing a linux shell command
      */
-    void executeExternalLinuxCommand(const std::string& command);
+    static void executeExternalLinuxCommand(const std::string& command);
 
     /** This method temporarily leaves curses mode and runs the given linux shell command then returns the result.
      *  This is not designed for interactive commands.
      * @param command A string containing a linux shell command
      * @return A string containing the whole output
      */
-    std::string executeLinuxCommand(const std::string& command);
+    static std::string executeLinuxCommand(const std::string& command);
 
 private:
     Page* currentPage{};
